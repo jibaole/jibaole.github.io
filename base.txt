@@ -1,0 +1,46 @@
+---
+title: 第一篇博客
+date: 2016-11-26 17:18:03
+tags: #标签
+categories: #分类
+comments: #是否允许评论 true 或 false
+toc: #是否添加文章目录 true 或 false
+thumbnail: #侧边栏封面图
+banner: #文章顶部封面图
+---
+---
+   简介：Welcome to [Hexo](https://hexo.io/)! This is your very first post. Check [documentation](https://hexo.io/docs/) for more info. If you get any problems when using Hexo, you can find the answer in [troubleshooting](https://hexo.io/docs/troubleshooting.html) or you can ask me on [GitHub](https://github.com/hexojs/hexo/issues).
+
+## 二级标题
+
+### 三级标题
+
+``` bash
+$ hexo new "My New Post"
+```
+<!--more-->
+More info: [Writing](https://hexo.io/docs/writing.html)
+
+### Run server
+
+``` bash
+$ hexo server
+```
+
+More info: [Server](https://hexo.io/docs/server.html)
+
+### Generate static files
+
+``` bash
+$ hexo generate
+```
+
+More info: [Generating](https://hexo.io/docs/generating.html)
+
+### Deploy to remote sites
+
+``` bash
+$ hexo deploy
+```
+
+More info: [Deployment](https://hexo.io/docs/deployment.html)

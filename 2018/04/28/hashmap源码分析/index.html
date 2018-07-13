@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <meta charset="utf-8">
+    
+    <title>HashMap源码分析 | Paul code</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="HashMap不仅仅是java里面很重要的知识点，也是日常开发使用最多的集合框架。了解它的特性，会对日常开发有很大的帮助。">
+<meta name="keywords" content="java,Map">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HashMap源码分析">
+<meta property="og:url" content="http://www.jibaole.top/2018/04/28/hashmap源码分析/index.html">
+<meta property="og:site_name" content="Paul code">
+<meta property="og:description" content="HashMap不仅仅是java里面很重要的知识点，也是日常开发使用最多的集合框架。了解它的特性，会对日常开发有很大的帮助。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://p22kojxuy.bkt.clouddn.com//blogjuc.jpg">
+<meta property="og:updated_time" content="2018-06-28T07:20:42.784Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="HashMap源码分析">
+<meta name="twitter:description" content="HashMap不仅仅是java里面很重要的知识点，也是日常开发使用最多的集合框架。了解它的特性，会对日常开发有很大的帮助。">
+<meta name="twitter:image" content="http://p22kojxuy.bkt.clouddn.com//blogjuc.jpg">
+    
+
+    
+        <link rel="alternate" href="/atom.xml" title="Paul code" type="application/atom+xml" />
+    
+
+    
+        <link rel="icon" href="/img/toux.png" />
+    
+
+    <link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/libs/open-sans/styles.css">
+    <link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+    <link rel="stylesheet" href="/libs/bootstrap/css/bootstrap.min.css">
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="/libs/bootstrap/js/bootstrap.min.js"></script>
+    
+    
+        <link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+        <script type="text/javascript">
+(function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-111707541-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+    
+    
+    
+        <script>
+var _hmt = _hmt || [];
+(function() {
+    var hm = document.createElement("script");
+    hm.src = "//hm.baidu.com/hm.js?095ffb1d0ab8973dcab22bc6c6c9ee59";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+    
+
+
+</head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">Paul code</span>
+            </a>
+            <nav id="main-nav">
+                <div>
+                                    <ul class="nav navbar-nav">
+                                        
+                                            <a class="main-nav-link" href="/">主页</a>
+                                        
+                                            <a class="main-nav-link" href="/archives">归档</a>
+                                        
+                                            <a class="main-nav-link" href="/categories">分类</a>
+                                        
+                                            <a class="main-nav-link" href="/tags">标签</a>
+                                        
+                                        <li class="dropdown">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                                更多
+                                                <b class="caret"></b>
+                                            </a>
+                                            <ul class="dropdown-menu">
+                                                
+                                                    <li><a href="/favorites">网址书签</a></li>
+                                                
+                                                    <li><a href="/study">学习</a></li>
+                                                
+                                                    <li><a href="/tools">工具</a></li>
+                                                
+                                                    <li><a href="/books">书单</a></li>
+                                                
+                                                    <li><a href="/life">生活</a></li>
+                                                
+                                                    <li><a href="/about">关于</a></li>
+                                                
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/img/touxiang.jpg" />
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="想要查找什么..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/">主页</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">归档</a></td>
+                
+                    <td><a class="main-nav-link" href="/categories">分类</a></td>
+                
+                    <td><a class="main-nav-link" href="/tags">标签</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/img/touxiang.jpg" />
+            <h2 id="name">Paul</h2>
+            <h3 id="title">专注于技术</h3>
+            <span id="location"><i class="fa fa-map-marker"></i>BeiJing, China</span>
+            <a id="follow" target="_blank" href="https://github.com/jibaole/">关注我</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                12
+                <span>文章</span>
+            </div>
+            <div class="article-info-block">
+                19
+                <span>标签</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="https://github.com/jibaole" target="_blank" title="github" class=tooltip>
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="mailto:jibaole@foxmail.com" target="_blank" title="envelope" class=tooltip>
+                            <i class="fa fa-envelope"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="https://gitee.com/jibaole.com" target="_blank" title="git" class=tooltip>
+                            <i class="fa fa-git"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/18501278945" target="_blank" title="wechat" class=tooltip>
+                            <i class="fa fa-wechat"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/atom.xml" target="_blank" title="rss" class=tooltip>
+                            <i class="fa fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-hashmap源码分析" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            HashMap源码分析
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2018/04/28/hashmap源码分析/">
+            <time datetime="2018-04-28T09:36:46.000Z" itemprop="datePublished">2018-04-28</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/map/">Map</a>, <a class="tag-link" href="/tags/java/">java</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+                <div id="toc" class="toc-article">
+                <strong class="toc-title">文章目录</strong>
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#哈希冲突"><span class="toc-number">1.</span> <span class="toc-text">哈希冲突</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#hashCode和equals"><span class="toc-number">2.</span> <span class="toc-text">hashCode和equals</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#HashMap"><span class="toc-number">3.</span> <span class="toc-text">HashMap</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#创建"><span class="toc-number">4.</span> <span class="toc-text">创建</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#新增"><span class="toc-number">5.</span> <span class="toc-text">新增</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#主要的代码在这里："><span class="toc-number">5.1.</span> <span class="toc-text">主要的代码在这里：</span></a></li></ol></li></ol>
+                </div>
+            
+            <blockquote>
+<p>HashMap不仅仅是java里面很重要的知识点，也是日常开发使用最多的集合框架。了解它的特性，会对日常开发有很大的帮助。<br><a id="more"></a></p>
+</blockquote>
+<h2 id="哈希冲突"><a href="#哈希冲突" class="headerlink" title="哈希冲突"></a>哈希冲突</h2><hr>
+<p>哈希是指通过某种方法把数据转变成特定的数值，数值根据mod对应到不同的单元上。比如在Java中，字符串就是通过每个字符的编码来计算、数字是本身对应的值等等，不过就算是再好的哈希方法，也有可能出现两个不同的对象hash值相同的情况。如果在HashMap中，hashcode相同，它们就会被分配到对应的存储位置，此时就会出现冲突——也叫做哈希冲突。</p>
+<p>解决哈希冲突的方法有很多种：</p>
+<p>开放地址探测法：即如果出现哈希冲突，则按照一定的规则继续选择位置，如线性探测法再、二次探测再、伪随机探测等等。<br>链地址法：如果出现冲突，则在冲突的位置后面形成链表进行存储。HashMap就是通过这种方式实现的<br>再哈希法：这种方法是再换另一个哈希方法寻找存储的位置。</p>
+<h2 id="hashCode和equals"><a href="#hashCode和equals" class="headerlink" title="hashCode和equals"></a>hashCode和equals</h2><hr>
+<p>首先hashcode是经过一定的方法映射出的数值，而equals如果没有重写的话，是对比了每个内部的属性。总结的来说，如果两个对象hashcode相同，它们未必相等；如果hashcode不同，肯定不等。从另一个角度说，如果两个对象equals相等，它们肯定相等；如果equals不同，则它们不同。</p>
+<p>那么肯定会有人疑问，那还要hashcode干嘛咧？Hashcode其实就是在hashMap或者hashset进行快速比较的时候有用，可以快速的判断对像是否不同，如果hashcode相同，则再继续对比equals方法。这样可以节省大量的时间。</p>
+<h2 id="HashMap"><a href="#HashMap" class="headerlink" title="HashMap"></a>HashMap</h2><p>HashMap允许null的key和value，HashMap根HashTable很像，只不过非线程安全并且允许Null值。</p>
+<p>有两个参数会影响Map的性能，分别是初始容量initial capacity和负载参数load facotr(确定了什么时间增加hash table的容量)。当容量超过load factor*initial capacity时，就会进行扩容，然后执行rehash操作。</p>
+<p>默认load factor时0.75，它基本已经能提供一个不错的性能效果了。不过在使用的初期可以预估一下数据量，直接设置一个比较适合的初始值。</p>
+<p>注意：HashMap不是线程安全的，可以通过<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Map m = Collections.synchronizedMap(new HashMap(...))</span><br></pre></td></tr></table></figure></p>
+<p>实现线程安全的map.</p>
+<h2 id="创建"><a href="#创建" class="headerlink" title="创建"></a>创建</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">transient Node&lt;K,V&gt;[] table;</span><br><span class="line">transient Set&lt;Map.Entry&lt;K,V&gt;&gt; entrySet;</span><br><span class="line">int threshold;</span><br><span class="line">final float loadFactor;</span><br></pre></td></tr></table></figure>
+<h2 id="新增"><a href="#新增" class="headerlink" title="新增"></a>新增</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public V put(K key, V value) &#123;</span><br><span class="line">    return putVal(hash(key), key, value, false, true);</span><br><span class="line">&#125;</span><br><span class="line">static final int hash(Object key) &#123;</span><br><span class="line">    int h;</span><br><span class="line">    return (key == null) ? 0 : (h = key.hashCode()) ^ (h &gt;&gt;&gt; 16);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="主要的代码在这里："><a href="#主要的代码在这里：" class="headerlink" title="主要的代码在这里："></a>主要的代码在这里：</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">final V putVal(int hash, K key, V value, boolean onlyIfAbsent,boolean evict) &#123;</span><br><span class="line">    Node&lt;K,V&gt;[] tab; Node&lt;K,V&gt; p; int n, i;</span><br><span class="line">    if ((tab = table) == null || (n = tab.length) == 0)</span><br><span class="line">        n = (tab = resize()).length;</span><br><span class="line">    if ((p = tab[i = (n - 1) &amp; hash]) == null)</span><br><span class="line">        tab[i] = newNode(hash, key, value, null);</span><br><span class="line">    else &#123;</span><br><span class="line">        Node&lt;K,V&gt; e; K k;</span><br><span class="line">        if (p.hash == hash &amp;&amp;</span><br><span class="line">            ((k = p.key) == key || (key != null &amp;&amp; key.equals(k))))</span><br><span class="line">            e = p;</span><br><span class="line">        else if (p instanceof TreeNode)</span><br><span class="line">            e = ((TreeNode&lt;K,V&gt;)p).putTreeVal(this, tab, hash, key, value);</span><br><span class="line">        else &#123;</span><br><span class="line">            for (int binCount = 0; ; ++binCount) &#123;</span><br><span class="line">                if ((e = p.next) == null) &#123;</span><br><span class="line">                    p.next = newNode(hash, key, value, null);</span><br><span class="line">                    // 如果每个链表长度超过8，那么就转为红黑树</span><br><span class="line">                    if (binCount &gt;= TREEIFY_THRESHOLD - 1) // -1 for 1st</span><br><span class="line">                        treeifyBin(tab, hash);</span><br><span class="line">                    break;</span><br><span class="line">                &#125;</span><br><span class="line">                if (e.hash == hash &amp;&amp;</span><br><span class="line">                    ((k = e.key) == key || (key != null &amp;&amp; key.equals(k))))</span><br><span class="line">                    break;</span><br><span class="line">                p = e;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        if (e != null) &#123; // existing mapping for key</span><br><span class="line">            V oldValue = e.value;</span><br><span class="line">            if (!onlyIfAbsent || oldValue == null)</span><br><span class="line">                e.value = value;</span><br><span class="line">            afterNodeAccess(e);</span><br><span class="line">            return oldValue;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    ++modCount;</span><br><span class="line">    if (++size &gt; threshold)</span><br><span class="line">        resize();</span><br><span class="line">    afterNodeInsertion(evict);</span><br><span class="line">    return null;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>对于写操作的场景：</p>
+<p>先会经过hash计算hashcode然后与size进行&amp;操作，判断存储的位置<br>如果存储的位置没有节点，则直接写入<br>如果存储的位置有节点，且是树节点，则向树中插入节点<br>如果存储的位置有节点，不是树节点（而是普通的链表），则进行头插。但是会判断当前链表的长度，如果超过设置的阈值（默认是8），就会把链表转化成树。<br>更新的时候也是上面的操作流程，只不过在对比hashcode相同时，还会检查key是否equals</p>
+<p>读取和删除基本上也是上面的套路。</p>
+<p>为什么非线程安全<br>这个主要是因为在rehash的时候由于table[]后面接的是链表，而hashMap还是采用头插的形式。因此如果有不同的线程同时进行rehash，就可能导致链表形成环形，造成死循环。</p>
+<p>具体的可以参考网上的文章：<a href="https://coolshell.cn/articles/9606.html" target="_blank" rel="noopener">https://coolshell.cn/articles/9606.html</a></p>
+
+        
+        </div>
+
+	<div id="donate" style="text-align:center">
+	<!-- 添加捐赠图标 -->
+<div class="post-donate" style="margin-bottom: 30px;margin-top: 10px;">
+    <div id="donate_board" class="donate_bar center">
+        <a id="btn_donate" class="btn_donate" href="javascript:;" title="donate"></a>
+        <span class="donate_txt">
+           欣赏此文？求鼓励，求支持！
+        </span>
+        <br>
+    </div>
+    <div id="donate_guide" class="donate_bar donate_bar2 center hidden">
+        <img src="/css/images/alipay.png" id="weixin" title="alipay doante" alt="alipay doante">
+        <img src="/css/images/wechatpay.png" title="wechatpay donate" id="zhifubao" alt="echatpay donate">
+    </div>
+    <script type="text/javascript">
+        $('#weixin').hover()
+        document.getElementById('btn_donate').onclick = function () {
+            $('#donate_board').addClass('hidden');
+            $('#donate_guide').removeClass('hidden');
+        }
+    </script>
+</div>
+	</div>
+
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+    <div class="bdsharebuttonbox">
+    <a href="#" class="bds_more" data-cmd="more">分享到：</a>
+    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间">QQ空间</a>
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博">新浪微博</a>
+    <a href="#" class="bds_tqq" data-cmd="tqq" title="分享到腾讯微博">腾讯微博</a>
+    <a href="#" class="bds_renren" data-cmd="renren" title="分享到人人网">人人网</a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信">微信</a>
+</div>
+<script>
+window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"16"},"share":{"bdSize":16}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+<style>
+    .bdshare_popup_box {
+        border-radius: 4px;
+        border: #e1e1e1 solid 1px;
+    }
+    .bdshare-button-style0-16 a,
+    .bdshare-button-style0-16 .bds_more {
+        padding-left: 20px;
+        margin: 6px 10px 6px 0;
+    }
+    .bdshare_dialog_list a,
+    .bdshare_popup_list a,
+    .bdshare_popup_bottom a {
+        font-family: 'Microsoft Yahei';
+    }
+    .bdshare_popup_top {
+        display: none;
+    }
+    .bdshare_popup_bottom {
+        height: auto;
+        padding: 5px;
+    }
+</style>
+
+
+</div>
+
+            
+    
+        <a href="http://www.jibaole.top/2018/04/28/hashmap源码分析/#comments" id="sourceId::2018/04/28/hashmap源码分析/" class="article-comment-link cy_cmt_count">评论</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+    
+        <a href="/2018/04/28/从acid到cap再到base/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">下一篇</strong>
+            <div class="article-nav-title">分布式理论-从ACID到CAP再到BASE</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    
+        <section id="comments">
+    <div id="SOHUCS" sid="2018/04/28/hashmap源码分析/"></div>
+</section>
+    
+
+</section>
+            
+                
+<aside id="sidebar">
+   
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">最新文章</h3>
+        <div class="widget">
+            <ul id="recent-post" class="">
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2018/04/28/hashmap源码分析/" class="thumbnail">
+    
+    
+        <span style="background-image:url(http://p22kojxuy.bkt.clouddn.com//blogjuc.jpg)" alt="HashMap源码分析" class="thumbnail-image"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2018/04/28/hashmap源码分析/" class="title">HashMap源码分析</a></p>
+                            <p class="item-date"><time datetime="2018-04-28T09:36:46.000Z" itemprop="datePublished">2018-04-28</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2018/04/28/从acid到cap再到base/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2018/04/28/从acid到cap再到base/" class="title">分布式理论-从ACID到CAP再到BASE</a></p>
+                            <p class="item-date"><time datetime="2018-04-28T06:45:12.000Z" itemprop="datePublished">2018-04-28</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2018/01/09/tools/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/工具/">工具</a></p>
+                            <p class="item-title"><a href="/2018/01/09/tools/" class="title">程序员日常工具清单(汇总!!!)</a></p>
+                            <p class="item-date"><time datetime="2018-01-09T10:35:05.000Z" itemprop="datePublished">2018-01-09</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2018/01/09/互联网黑话/" class="thumbnail">
+    
+    
+        <span style="background-image:url(http://p22kojxuy.bkt.clouddn.com/Article/img/2018/01/internetheihua.png)" alt="互联网程序员行话" class="thumbnail-image"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/互联网/">互联网</a></p>
+                            <p class="item-title"><a href="/2018/01/09/互联网黑话/" class="title">互联网程序员行话</a></p>
+                            <p class="item-date"><time datetime="2018-01-09T05:16:29.000Z" itemprop="datePublished">2018-01-09</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2018/01/06/Redis/" class="thumbnail">
+    
+    
+        <span style="background-image:url(http://p22kojxuy.bkt.clouddn.com/Article/img/2018/01/redis.jpg)" alt="Redis常用操作命令" class="thumbnail-image"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2018/01/06/Redis/" class="title">Redis常用操作命令</a></p>
+                            <p class="item-date"><time datetime="2018-01-06T12:07:43.000Z" itemprop="datePublished">2018-01-06</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">归档</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">4</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签云</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/acid/" style="font-size: 10px;">ACID</a> <a href="/tags/base/" style="font-size: 10px;">BASE</a> <a href="/tags/cap/" style="font-size: 10px;">CAP</a> <a href="/tags/coding/" style="font-size: 10px;">Coding</a> <a href="/tags/git/" style="font-size: 20px;">Git</a> <a href="/tags/github/" style="font-size: 10px;">GitHub</a> <a href="/tags/hexo/" style="font-size: 20px;">Hexo</a> <a href="/tags/intellij-idea/" style="font-size: 10px;">Intellij Idea</a> <a href="/tags/map/" style="font-size: 10px;">Map</a> <a href="/tags/markdown/" style="font-size: 10px;">Markdown</a> <a href="/tags/redis/" style="font-size: 10px;">Redis</a> <a href="/tags/webmagic/" style="font-size: 10px;">WebMagic</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/互联网/" style="font-size: 20px;">互联网</a> <a href="/tags/分布式/" style="font-size: 10px;">分布式</a> <a href="/tags/工具/" style="font-size: 10px;">工具</a> <a href="/tags/爬虫/" style="font-size: 10px;">爬虫</a> <a href="/tags/行话/" style="font-size: 10px;">行话</a>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">链接</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a href="http://hexo.io"  target="_blank">Hexo</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://zoufeng.net/"  target="_blank">foam | 我一直在找寻有你的世界</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://www.luojiawei.me/"  target="_blank">getNway的博客</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://hclab.cn/hclab/index.php/"  target="_blank">HCLAB-环宇创意电脑工作室</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+
+            
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2018 Paul<br>
+            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>  <a href="http://github.com/jibaole/">专注|技术</a>
+        </div>
+    </div>
+</footer>
+        
+    
+    <script id="cy_cmt_num" src="https://changyan.sohu.com/upload/plugins/plugins.list.count.js?clientId=cytonBPwX"></script>
+    <script charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/changyan.js" ></script>
+    <script type="text/javascript">
+    window.changyan.api.config({
+    appid: 'cytonBPwX',
+    conf: '1b66209a6513b68c97b0e6a412323593'
+    });
+    </script>
+
+
+
+
+    
+        <script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/js/main.js"></script>
+
+    </div>
+</body>
+</html>
