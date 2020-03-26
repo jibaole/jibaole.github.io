@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <meta charset="utf-8">
+    
+    <title>Kafka 安装及快速入门 | Paul code</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="Apache Kafka是分布式发布-订阅消息系统。它最初由LinkedIn公司开发，之后成为Apache项目的一部分。Kafka是一种快速、可扩展的、设计内在就是分布式的，分区的和可复制的提交日志服务。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kafka 安装及快速入门">
+<meta property="og:url" content="http://www.jibaole.top/2019/05/24/kafka-%E5%AE%89%E8%A3%85%E5%8F%8A%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8/index.html">
+<meta property="og:site_name" content="Paul code">
+<meta property="og:description" content="Apache Kafka是分布式发布-订阅消息系统。它最初由LinkedIn公司开发，之后成为Apache项目的一部分。Kafka是一种快速、可扩展的、设计内在就是分布式的，分区的和可复制的提交日志服务。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog-1255565289.cos.ap-beijing.myqcloud.com/image/20190526225908.png">
+<meta property="article:published_time" content="2019-05-24T05:01:38.000Z">
+<meta property="article:modified_time" content="2020-03-26T09:19:17.731Z">
+<meta property="article:author" content="Paul">
+<meta property="article:tag" content="Kafka">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog-1255565289.cos.ap-beijing.myqcloud.com/image/20190526225908.png">
+    
+
+    
+        <link rel="alternate" href="/atom.xml" title="Paul code" type="application/atom+xml" />
+    
+
+    
+        <link rel="icon" href="/img/toux.png" />
+    
+
+    
+<link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+
+    
+<link rel="stylesheet" href="/libs/open-sans/styles.css">
+
+    
+<link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+    
+<link rel="stylesheet" href="/libs/bootstrap/css/bootstrap.min.css">
+
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+<script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+
+    
+<script src="/libs/bootstrap/js/bootstrap.min.js"></script>
+
+    
+    
+        
+<link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+
+    
+    
+        
+<link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+
+    
+    
+        <script type="text/javascript">
+(function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-111707541-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+    
+    
+    
+        <script>
+var _hmt = _hmt || [];
+(function() {
+    var hm = document.createElement("script");
+    hm.src = "//hm.baidu.com/hm.js?095ffb1d0ab8973dcab22bc6c6c9ee59";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+    
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">Paul code</span>
+            </a>
+            <nav id="main-nav">
+                <div>
+                                    <ul class="nav navbar-nav">
+                                        
+                                            <a class="main-nav-link" href="/">主页</a>
+                                        
+                                            <a class="main-nav-link" href="/archives">归档</a>
+                                        
+                                            <a class="main-nav-link" href="/categories">分类</a>
+                                        
+                                            <a class="main-nav-link" href="/tags">标签</a>
+                                        
+                                        <li class="dropdown">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                                更多
+                                                <b class="caret"></b>
+                                            </a>
+                                            <ul class="dropdown-menu">
+                                                
+                                                    <li><a href="/favorites">网址书签</a></li>
+                                                
+                                                    <li><a href="/study">学习</a></li>
+                                                
+                                                    <li><a href="/tools">工具</a></li>
+                                                
+                                                    <li><a href="/books">书单</a></li>
+                                                
+                                                    <li><a href="/life">生活</a></li>
+                                                
+                                                    <li><a href="/about">关于</a></li>
+                                                
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/img/touxiang.jpg" />
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="想要查找什么..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/">主页</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">归档</a></td>
+                
+                    <td><a class="main-nav-link" href="/categories">分类</a></td>
+                
+                    <td><a class="main-nav-link" href="/tags">标签</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/img/touxiang.jpg" />
+            <h2 id="name">Paul</h2>
+            <h3 id="title">专注于技术</h3>
+            <span id="location"><i class="fa fa-map-marker"></i>BeiJing, China</span>
+            <a id="follow" target="_blank" href="https://github.com/jibaole/">关注我</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                25
+                <span>文章</span>
+            </div>
+            <div class="article-info-block">
+                33
+                <span>标签</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="https://github.com/jibaole" target="_blank" title="github" class=tooltip>
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="mailto:jibaole@foxmail.com" target="_blank" title="envelope" class=tooltip>
+                            <i class="fa fa-envelope"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="https://gitee.com/jibaole.com" target="_blank" title="git" class=tooltip>
+                            <i class="fa fa-git"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/18501278945" target="_blank" title="wechat" class=tooltip>
+                            <i class="fa fa-wechat"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/atom.xml" target="_blank" title="rss" class=tooltip>
+                            <i class="fa fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-kafka-安装及快速入门" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            Kafka 安装及快速入门
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2019/05/24/kafka-%E5%AE%89%E8%A3%85%E5%8F%8A%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8/">
+            <time datetime="2019-05-24T05:01:38.000Z" itemprop="datePublished">2019-05-24</time>
+        </a>
+    </div>
+
+
+                        
+    <div class="article-category">
+    	<i class="fa fa-folder"></i>
+        <a class="article-category-link" href="/categories/%E4%B8%AD%E9%97%B4%E4%BB%B6/">中间件</a>
+    </div>
+
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/kafka/" rel="tag">Kafka</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <p>Apache Kafka是分布式发布-订阅消息系统。它最初由LinkedIn公司开发，之后成为Apache项目的一部分。Kafka是一种快速、可扩展的、设计内在就是分布式的，分区的和可复制的提交日志服务。</p>
+<a id="more"></a>
+
+
+<p><img src="https://blog-1255565289.cos.ap-beijing.myqcloud.com/image/20190526225908.png" alt=""></p>
+<blockquote>
+<p>介绍</p>
+</blockquote>
+<p>官网：<a href="http://kafka.apache.org/" target="_blank" rel="noopener">http://kafka.apache.org/</a></p>
+<p>Apache Kafka与传统消息系统相比，有以下不同：</p>
+<ul>
+<li>它被设计为一个分布式系统，易于向外扩展；</li>
+</ul>
+<ul>
+<li>它同时为发布和订阅提供高吞吐量；</li>
+</ul>
+<ul>
+<li>它支持多订阅者，当失败时能自动平衡消费者；</li>
+</ul>
+<ul>
+<li>它将消息持久化到磁盘，因此可用于批量消费，例如ETL，以及实时应用程序。</li>
+</ul>
+<blockquote>
+<p>安装 kafka<br>下载地址：<a href="https://kafka.apache.org/downloads" target="_blank" rel="noopener">https://kafka.apache.org/downloads</a></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget http:&#x2F;&#x2F;mirrors.shuosc.org&#x2F;apache&#x2F;kafka&#x2F;1.0.0&#x2F;kafka_2.11-1.0.0.tgz</span><br></pre></td></tr></table></figure>
+
+<p>解压：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">tar -zxvf kafka_2.11-1.0.0.tgz</span><br><span class="line"></span><br><span class="line">cd &#x2F;usr&#x2F;local&#x2F;kafka_2.11-1.0.0&#x2F;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>修改 kafka-server 的配置文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim &#x2F;usr&#x2F;local&#x2F;kafka&#x2F;config&#x2F;server.properties</span><br></pre></td></tr></table></figure>
+<p>修改其中的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">broker.id&#x3D;1</span><br><span class="line">log.dir&#x3D;&#x2F;data&#x2F;kafka&#x2F;logs-1</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>功能验证：</p>
+</blockquote>
+<p>1、启动 zk</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">使用安装包中的脚本启动单节点 Zookeeper 实例：</span><br><span class="line"></span><br><span class="line">bin&#x2F;zookeeper-server-start.sh -daemon config&#x2F;zookeeper.properties</span><br></pre></td></tr></table></figure>
+<p>2、启动Kafka 服务</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">使用 kafka-server-start.sh 启动 kafka 服务：</span><br><span class="line"></span><br><span class="line">bin&#x2F;kafka-server-start.sh config&#x2F;server.properties</span><br></pre></td></tr></table></figure>
+<p><img src="https://blog-1255565289.cos.ap-beijing.myqcloud.com/image/20190524135753.png" alt=""></p>
+<p>3、创建 topic<br>使用 kafka-topics.sh 创建单分区单副本的 topic test：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bin&#x2F;kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic test</span><br></pre></td></tr></table></figure>
+<p>查看 topic 列表：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bin&#x2F;kafka-topics.sh --list --zookeeper localhost:2181</span><br></pre></td></tr></table></figure>
+<p>查询创建的 topic 列表报错：</p>
+<p><img src="https://blog-1255565289.cos.ap-beijing.myqcloud.com/image/20190524135934.png" alt=""></p>
+<p>解决方法:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim &#x2F;etc&#x2F;hosts</span><br></pre></td></tr></table></figure>
+
+<p>将 host 里的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4</span><br><span class="line">::1         localhost localhost.localdomain localhost6 localhost6.localdomain6</span><br></pre></td></tr></table></figure>
+<p>修改为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4</span><br><span class="line">::1         ip6-localhost ip6-localhost.localdomain localhost6 localhost6.localdomain6</span><br></pre></td></tr></table></figure>
+<p>方法参考：zookeeper unable to open socket to localhost/0:0:0:0:0:0:0:1:2181</p>
+<p>再次查询就不报错了。</p>
+<p>4、产生消息<br>使用 kafka-console-producer.sh 发送消息：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bin&#x2F;kafka-console-producer.sh --broker-list localhost:9092 --topic test</span><br></pre></td></tr></table></figure>
+<p><img src="https://blog-1255565289.cos.ap-beijing.myqcloud.com/image/20190524140103.png" alt=""></p>
+<p>5、消费消息<br>使用 kafka-console-consumer.sh 接收消息并在终端打印：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bin&#x2F;kafka-console-consumer.sh --zookeeper localhost:2181 --topic test --from-beginning</span><br></pre></td></tr></table></figure>
+<p>打开个新的命令窗口执行上面命令即可查看信息：</p>
+<p><img src="https://blog-1255565289.cos.ap-beijing.myqcloud.com/image/20190524140135.png" alt=""></p>
+<p>6、查看描述 topics 信息</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bin&#x2F;kafka-topics.sh --describe --zookeeper localhost:2181 --topic test</span><br></pre></td></tr></table></figure>
+<p>结果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Topic:test    PartitionCount:1    ReplicationFactor:1    Configs:</span><br><span class="line">    Topic: test    Partition: 0    Leader: 1    Replicas: 1    Isr: 1</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://blog-1255565289.cos.ap-beijing.myqcloud.com/image/20190524140211.png" alt=""></p>
+<p>第一行给出了所有分区的摘要，每个附加行给出了关于一个分区的信息。 由于我们只有一个分区，所以只有一行。</p>
+<p>“Leader”: 是负责给定分区的所有读取和写入的节点。 每个节点将成为分区随机选择部分的领导者。</p>
+<p>“Replicas”: 是复制此分区日志的节点列表，无论它们是否是领导者，或者即使他们当前处于活动状态。</p>
+<p>“Isr”: 是一组“同步”副本。这是复制品列表的子集，当前活着并被引导到领导者。</p>
+<blockquote>
+<p>集群配置</p>
+</blockquote>
+<p>Kafka 支持两种模式的集群搭建：可以在单机上运行多个 broker 实例来实现集群，也可在多台机器上搭建集群，下面介绍下如何实现单机多 broker 实例集群，其实很简单，只需要如下配置即可。</p>
+<blockquote>
+<p>单机多broker 集群配置</p>
+</blockquote>
+<p>利用单节点部署多个 broker。 不同的 broker 设置不同的 id，监听端口及日志目录。 例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">cp config&#x2F;server.properties config&#x2F;server-2.properties</span><br><span class="line"></span><br><span class="line">cp config&#x2F;server.properties config&#x2F;server-3.properties</span><br><span class="line"></span><br><span class="line">vim config&#x2F;server-2.properties</span><br><span class="line"></span><br><span class="line">vim config&#x2F;server-3.properties</span><br></pre></td></tr></table></figure>
+
+<p>修改 ：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">broker.id&#x3D;2</span><br><span class="line"></span><br><span class="line">listeners &#x3D; PLAINTEXT:&#x2F;&#x2F;your.host.name:9093</span><br><span class="line"></span><br><span class="line">log.dir&#x3D;&#x2F;data&#x2F;kafka&#x2F;logs-2</span><br></pre></td></tr></table></figure>
+<p>和</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">broker.id&#x3D;3</span><br><span class="line"></span><br><span class="line">listeners &#x3D; PLAINTEXT:&#x2F;&#x2F;your.host.name:9094</span><br><span class="line"></span><br><span class="line">log.dir&#x3D;&#x2F;data&#x2F;kafka&#x2F;logs-3</span><br></pre></td></tr></table></figure>
+<p>启动Kafka服务：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">bin&#x2F;kafka-server-start.sh config&#x2F;server-2.properties &amp;</span><br><span class="line"></span><br><span class="line">bin&#x2F;kafka-server-start.sh config&#x2F;server-3.properties &amp;</span><br></pre></td></tr></table></figure>
+<p>至此，单机多broker实例的集群配置完毕。</p>
+<blockquote>
+<p>多机多 broker 集群配置<br>分别在多个节点按上述方式安装 Kafka，配置启动多个 Zookeeper 实例。</p>
+</blockquote>
+<p>假设三台机器 IP 地址是 ： 192.168.153.135， 192.168.153.136， 192.168.153.137</p>
+<p>分别配置多个机器上的 Kafka 服务，设置不同的 broker id，zookeeper.connect 设置如下:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim config&#x2F;server.properties</span><br></pre></td></tr></table></figure>
+<p>里面的 zookeeper.connect</p>
+<p>修改为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">zookeeper.connect&#x3D;192.168.153.135:2181,192.168.153.136:2181,192.168.153.137:2181</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>使用 Kafka Connect 来导入/导出数据<br>从控制台写入数据并将其写回控制台是一个方便的起点，但您可能想要使用其他来源的数据或将数据从 Kafka 导出到其他系统。对于许多系统，您可以使用 Kafka Connect 来导入或导出数据，而不必编写自定义集成代码。</p>
+</blockquote>
+<p>Kafka Connect 是 Kafka 包含的一个工具，可以将数据导入和导出到 Kafka。它是一个可扩展的工具，运行 连接器，实现与外部系统交互的自定义逻辑。在这个快速入门中，我们将看到如何使用简单的连接器运行 Kafka Connect，这些连接器将数据从文件导入到 Kafka topic，并将数据从 Kafka topic 导出到文件。</p>
+<p>首先，我们将通过创建一些种子数据开始测试：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo -e &quot;zhisheng\ntian&quot; &gt; test.txt</span><br></pre></td></tr></table></figure>
+<p><img src="https://blog-1255565289.cos.ap-beijing.myqcloud.com/image/20190524140413.png" alt=""></p>
+<p>接下来，我们将启动两个以独立模式运行的连接器，这意味着它们将在单个本地专用进程中运行。我们提供三个配置文件作为参数。首先是 Kafka Connect 过程的配置，包含常见的配置，例如要连接的 Kafka 代理以及数据的序列化格式。其余的配置文件都指定一个要创建的连接器。这些文件包括唯一的连接器名称，要实例化的连接器类以及连接器所需的任何其他配置。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bin&#x2F;connect-standalone.sh config&#x2F;connect-standalone.properties config&#x2F;connect-file-source.properties config&#x2F;connect-file-sink.properties</span><br></pre></td></tr></table></figure>
+<p>Kafka 附带的这些示例配置文件使用您之前启动的默认本地群集配置，并创建两个连接器：第一个是源连接器，用于读取输入文件中的行，并将每个连接生成为 Kafka topic，第二个为连接器它从 Kafka topic 读取消息，并在输出文件中产生每行消息。</p>
+<p>在启动过程中，您会看到一些日志消息，其中一些指示连接器正在实例化。Kafka Connect 进程启动后，源连接器应该开始读取 test.txt topic connect-test，并将其生成 topic ，并且接收器连接器应该开始读取 topic 中的消息 connect-test 并将其写入文件 test.sink.txt。我们可以通过检查输出文件的内容来验证通过整个管道传输的数据：</p>
+<p><img src="https://blog-1255565289.cos.ap-beijing.myqcloud.com/image/20190524140557.png" alt=""></p>
+<p>数据存储在 Kafka topic 中 connect-test，因此我们也可以运行控制台使用者来查看 topic 中的数据</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bin&#x2F;kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic connect-test --from-beginning</span><br></pre></td></tr></table></figure>
+<p><img src="https://blog-1255565289.cos.ap-beijing.myqcloud.com/image/20190524140621.png" alt=""></p>
+<p>连接器继续处理数据，所以我们可以将数据添加到文件中，并看到它在管道中移动：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">echo zhishengtian&gt;&gt; test.txt</span><br><span class="line">echo zhishengtian2&gt;&gt; test.txt</span><br><span class="line">echo zhishengtian3&gt;&gt; test.txt</span><br><span class="line">echo zhishengtian4&gt;&gt; test.txt</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://blog-1255565289.cos.ap-beijing.myqcloud.com/image/20190524140642.png" alt=""></p>
+<p><img src="https://blog-1255565289.cos.ap-beijing.myqcloud.com/image/20190524140651.png" alt=""></p>
+<blockquote>
+<p>使用 Kafka 流来处理数据</p>
+</blockquote>
+<p>Kafka Streams 是用于构建关键任务实时应用程序和微服务的客户端库，输入和/或输出数据存储在 Kafka 集群中。Kafka Streams 结合了在客户端编写和部署标准 Java 和 Scala 应用程序的简单性以及 Kafka 服务器端集群技术的优势，使这些应用程序具有高度可伸缩性，弹性，容错性，分布式等特性。<br>可参考官网入门案例：<a href="http://kafka.apache.org/10/documentation/streams/quickstart" target="_blank" rel="noopener">http://kafka.apache.org/10/documentation/streams/quickstart</a></p>
+<blockquote>
+<p>参考</p>
+</blockquote>
+<p>1、在CentOS 7上安装Kafka</p>
+<p>2、<a href="http://kafka.apache.org/10/documentation/streams/quickstart" target="_blank" rel="noopener">http://kafka.apache.org/10/documentation/streams/quickstart</a></p>
+
+        
+        </div>
+
+	<div id="donate" style="text-align:center">
+	<!-- 添加捐赠图标 -->
+<div class="post-donate" style="margin-bottom: 30px;margin-top: 10px;">
+    <div id="donate_board" class="donate_bar center">
+        <a id="btn_donate" class="btn_donate" href="javascript:;" title="donate"></a>
+        <span class="donate_txt">
+           欣赏此文？求鼓励，求支持！
+        </span>
+        <br>
+    </div>
+    <div id="donate_guide" class="donate_bar donate_bar2 center hidden">
+        <img src="/css/images/alipay.png" id="weixin" title="alipay doante" alt="alipay doante">
+        <img src="/css/images/wechatpay.png" title="wechatpay donate" id="zhifubao" alt="echatpay donate">
+    </div>
+    <script type="text/javascript">
+        $('#weixin').hover()
+        document.getElementById('btn_donate').onclick = function () {
+            $('#donate_board').addClass('hidden');
+            $('#donate_guide').removeClass('hidden');
+        }
+    </script>
+</div>
+	</div>
+
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+    <div class="bdsharebuttonbox">
+    <a href="#" class="bds_more" data-cmd="more">分享到：</a>
+    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间">QQ空间</a>
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博">新浪微博</a>
+    <a href="#" class="bds_tqq" data-cmd="tqq" title="分享到腾讯微博">腾讯微博</a>
+    <a href="#" class="bds_renren" data-cmd="renren" title="分享到人人网">人人网</a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信">微信</a>
+</div>
+<script>
+window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"16"},"share":{"bdSize":16}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+<style>
+    .bdshare_popup_box {
+        border-radius: 4px;
+        border: #e1e1e1 solid 1px;
+    }
+    .bdshare-button-style0-16 a,
+    .bdshare-button-style0-16 .bds_more {
+        padding-left: 20px;
+        margin: 6px 10px 6px 0;
+    }
+    .bdshare_dialog_list a,
+    .bdshare_popup_list a,
+    .bdshare_popup_bottom a {
+        font-family: 'Microsoft Yahei';
+    }
+    .bdshare_popup_top {
+        display: none;
+    }
+    .bdshare_popup_bottom {
+        height: auto;
+        padding: 5px;
+    }
+</style>
+
+
+</div>
+
+            
+    
+        <a href="http://www.jibaole.top/2019/05/24/kafka-%E5%AE%89%E8%A3%85%E5%8F%8A%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8/#comments" id="sourceId::2019/05/24/kafka-安装及快速入门/" class="article-comment-link cy_cmt_count">评论</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+        <a href="/2019/05/26/JVM-%E7%BA%BF%E4%B8%8A%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C%E6%B5%81%E7%A8%8B/" id="article-nav-newer" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">上一篇</strong>
+            <div class="article-nav-title">
+                
+                    JVM 线上故障排查基本操作流程
+                
+            </div>
+        </a>
+    
+    
+        <a href="/2019/05/18/linux%E5%91%BD%E4%BB%A4%E4%B9%8Bless/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">下一篇</strong>
+            <div class="article-nav-title">Linux命令之Less</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    
+        <section id="comments">
+    <div id="SOHUCS" sid="2019/05/24/kafka-安装及快速入门/"></div>
+</section>
+    
+
+</section>
+            
+                
+<aside id="sidebar">
+   
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">最新文章</h3>
+        <div class="widget">
+            <ul id="recent-post" class="">
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2019/06/18/mysql%E6%9F%A5%E7%9C%8B%E9%94%81%E8%A1%A8%E5%9C%BA%E6%99%AF%E5%A4%84%E7%90%86/" class="thumbnail">
+    
+    
+        <span style="background-image:url(http://p22kojxuy.bkt.clouddn.com/Article/img/2018/01/tython.jpg)" alt="MySQL查看锁表场景处理" class="thumbnail-image"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2019/06/18/mysql%E6%9F%A5%E7%9C%8B%E9%94%81%E8%A1%A8%E5%9C%BA%E6%99%AF%E5%A4%84%E7%90%86/" class="title">MySQL查看锁表场景处理</a></p>
+                            <p class="item-date"><time datetime="2019-06-18T08:31:31.000Z" itemprop="datePublished">2019-06-18</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2019/05/27/%E8%AE%B0%E4%B8%80%E6%AC%A1%E7%BA%BF%E4%B8%8A%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5/" class="thumbnail">
+    
+    
+        <span style="background-image:url(https://blog-1255565289.cos.ap-beijing.myqcloud.com/image/20190526225740.png)" alt="记一次线上问题排查" class="thumbnail-image"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/java/">Java</a></p>
+                            <p class="item-title"><a href="/2019/05/27/%E8%AE%B0%E4%B8%80%E6%AC%A1%E7%BA%BF%E4%B8%8A%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5/" class="title">记一次线上问题排查</a></p>
+                            <p class="item-date"><time datetime="2019-05-27T12:06:21.000Z" itemprop="datePublished">2019-05-27</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2019/05/26/JVM-%E7%BA%BF%E4%B8%8A%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C%E6%B5%81%E7%A8%8B/" class="thumbnail">
+    
+    
+        <span style="background-image:url(https://blog-1255565289.cos.ap-beijing.myqcloud.com/image/20190526225740.png)" alt="JVM 线上故障排查基本操作流程" class="thumbnail-image"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/java/">Java</a></p>
+                            <p class="item-title"><a href="/2019/05/26/JVM-%E7%BA%BF%E4%B8%8A%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C%E6%B5%81%E7%A8%8B/" class="title">JVM 线上故障排查基本操作流程</a></p>
+                            <p class="item-date"><time datetime="2019-05-26T14:40:14.000Z" itemprop="datePublished">2019-05-26</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2019/05/24/kafka-%E5%AE%89%E8%A3%85%E5%8F%8A%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8/" class="thumbnail">
+    
+    
+        <span style="background-image:url(https://blog-1255565289.cos.ap-beijing.myqcloud.com/image/20190526225908.png)" alt="Kafka 安装及快速入门" class="thumbnail-image"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/%E4%B8%AD%E9%97%B4%E4%BB%B6/">中间件</a></p>
+                            <p class="item-title"><a href="/2019/05/24/kafka-%E5%AE%89%E8%A3%85%E5%8F%8A%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8/" class="title">Kafka 安装及快速入门</a></p>
+                            <p class="item-date"><time datetime="2019-05-24T05:01:38.000Z" itemprop="datePublished">2019-05-24</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2019/05/18/linux%E5%91%BD%E4%BB%A4%E4%B9%8Bless/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/linux/">Linux</a></p>
+                            <p class="item-title"><a href="/2019/05/18/linux%E5%91%BD%E4%BB%A4%E4%B9%8Bless/" class="title">Linux命令之Less</a></p>
+                            <p class="item-date"><time datetime="2019-05-18T04:17:07.000Z" itemprop="datePublished">2019-05-18</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">归档</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">五月 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">4</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签云</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/acid/" style="font-size: 10px;">ACID</a> <a href="/tags/alyunmq/" style="font-size: 10px;">AlYunMQ</a> <a href="/tags/base/" style="font-size: 10px;">BASE</a> <a href="/tags/cap/" style="font-size: 10px;">CAP</a> <a href="/tags/coding/" style="font-size: 10px;">Coding</a> <a href="/tags/git/" style="font-size: 15px;">Git</a> <a href="/tags/github/" style="font-size: 10px;">GitHub</a> <a href="/tags/hexo/" style="font-size: 15px;">Hexo</a> <a href="/tags/intellij-idea/" style="font-size: 10px;">Intellij Idea</a> <a href="/tags/java/" style="font-size: 10px;">JAVA</a> <a href="/tags/jdk8/" style="font-size: 10px;">JDK8</a> <a href="/tags/jvm/" style="font-size: 10px;">JVM</a> <a href="/tags/jenkins/" style="font-size: 15px;">Jenkins</a> <a href="/tags/kafka/" style="font-size: 10px;">Kafka</a> <a href="/tags/linux/" style="font-size: 20px;">Linux</a> <a href="/tags/mq/" style="font-size: 10px;">MQ</a> <a href="/tags/mac/" style="font-size: 10px;">Mac</a> <a href="/tags/map/" style="font-size: 10px;">Map</a> <a href="/tags/markdown/" style="font-size: 10px;">Markdown</a> <a href="/tags/mysql/" style="font-size: 10px;">MySQL</a> <a href="/tags/redis/" style="font-size: 10px;">Redis</a> <a href="/tags/webmagic/" style="font-size: 10px;">WebMagic</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/osn/" style="font-size: 10px;">osn</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/%E4%BA%92%E8%81%94%E7%BD%91/" style="font-size: 15px;">互联网</a> <a href="/tags/%E4%BC%98%E5%8C%96/" style="font-size: 10px;">优化</a> <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F/" style="font-size: 10px;">分布式</a> <a href="/tags/%E5%91%BD%E4%BB%A4/" style="font-size: 10px;">命令</a> <a href="/tags/%E5%B7%A5%E5%85%B7/" style="font-size: 10px;">工具</a> <a href="/tags/%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/" style="font-size: 10px;">开发工具</a> <a href="/tags/%E7%88%AC%E8%99%AB/" style="font-size: 10px;">爬虫</a> <a href="/tags/%E8%A1%8C%E8%AF%9D/" style="font-size: 10px;">行话</a>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">链接</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a href="http://hexo.io"  target="_blank">Hexo</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://zoufeng.net/"  target="_blank">foam | 我一直在找寻有你的世界</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://www.luojiawei.me/"  target="_blank">getNway的博客</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://hclab.cn/hclab/index.php/"  target="_blank">HCLAB-环宇创意电脑工作室</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+
+            
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2020 Paul<br>
+             <a  href="http://www.jibaole.top/" target="_blank">吉保乐</a>   <a href="http://beian.miit.gov.cn" target="_blank">京ICP备19023154号-1</a> <a href="http://github.com/jibaole/" target="_blank" rel="noopener">专注|技术</a>
+        </div>
+    </div>
+</footer>
+        
+    
+    <script id="cy_cmt_num" src="https://changyan.sohu.com/upload/plugins/plugins.list.count.js?clientId=cytonBPwX"></script>
+    <script charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/changyan.js" ></script>
+    <script type="text/javascript">
+    window.changyan.api.config({
+    appid: 'cytonBPwX',
+    conf: '1b66209a6513b68c97b0e6a412323593'
+    });
+    </script>
+
+
+
+
+    
+        
+<script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-share.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-video.min.js"></script>
+
+    
+    
+        
+<script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+
+    
+    
+
+
+
+<!-- Custom Scripts -->
+
+<script src="/js/main.js"></script>
+
+
+    </div>
+</body>
+</html>

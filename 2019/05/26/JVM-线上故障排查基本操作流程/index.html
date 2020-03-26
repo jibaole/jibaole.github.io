@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <meta charset="utf-8">
+    
+    <title>JVM 线上故障排查基本操作流程 | Paul code</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="前言对于后端程序员，特别是 Java 程序员来讲，排查线上问题是不可避免的,各种 CPU 飚高，内存溢出，频繁 GC 等等，这些都是令人头疼的问题。楼主同样也遇到过这些问题，那么，遇到这些问题该如何解决呢？ 首先，出现问题，肯定要先定位问题所在，然后分析问题原因，再然后解决问题，最后进行总结，防止下次再次出现。 今天的文章，就如我们的题目一样，讲的是基本操作，也就是一些排查线上问题的基本方法。为什">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JVM 线上故障排查基本操作流程">
+<meta property="og:url" content="http://www.jibaole.top/2019/05/26/JVM-%E7%BA%BF%E4%B8%8A%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C%E6%B5%81%E7%A8%8B/index.html">
+<meta property="og:site_name" content="Paul code">
+<meta property="og:description" content="前言对于后端程序员，特别是 Java 程序员来讲，排查线上问题是不可避免的,各种 CPU 飚高，内存溢出，频繁 GC 等等，这些都是令人头疼的问题。楼主同样也遇到过这些问题，那么，遇到这些问题该如何解决呢？ 首先，出现问题，肯定要先定位问题所在，然后分析问题原因，再然后解决问题，最后进行总结，防止下次再次出现。 今天的文章，就如我们的题目一样，讲的是基本操作，也就是一些排查线上问题的基本方法。为什">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog-1255565289.cos.ap-beijing.myqcloud.com/image/20190526225740.png">
+<meta property="article:published_time" content="2019-05-26T14:40:14.000Z">
+<meta property="article:modified_time" content="2020-03-26T09:19:17.728Z">
+<meta property="article:author" content="Paul">
+<meta property="article:tag" content="JVM">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog-1255565289.cos.ap-beijing.myqcloud.com/image/20190526225740.png">
+    
+
+    
+        <link rel="alternate" href="/atom.xml" title="Paul code" type="application/atom+xml" />
+    
+
+    
+        <link rel="icon" href="/img/toux.png" />
+    
+
+    
+<link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+
+    
+<link rel="stylesheet" href="/libs/open-sans/styles.css">
+
+    
+<link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+    
+<link rel="stylesheet" href="/libs/bootstrap/css/bootstrap.min.css">
+
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+<script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+
+    
+<script src="/libs/bootstrap/js/bootstrap.min.js"></script>
+
+    
+    
+        
+<link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+
+    
+    
+        
+<link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+
+    
+    
+        <script type="text/javascript">
+(function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-111707541-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+    
+    
+    
+        <script>
+var _hmt = _hmt || [];
+(function() {
+    var hm = document.createElement("script");
+    hm.src = "//hm.baidu.com/hm.js?095ffb1d0ab8973dcab22bc6c6c9ee59";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+    
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">Paul code</span>
+            </a>
+            <nav id="main-nav">
+                <div>
+                                    <ul class="nav navbar-nav">
+                                        
+                                            <a class="main-nav-link" href="/">主页</a>
+                                        
+                                            <a class="main-nav-link" href="/archives">归档</a>
+                                        
+                                            <a class="main-nav-link" href="/categories">分类</a>
+                                        
+                                            <a class="main-nav-link" href="/tags">标签</a>
+                                        
+                                        <li class="dropdown">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                                更多
+                                                <b class="caret"></b>
+                                            </a>
+                                            <ul class="dropdown-menu">
+                                                
+                                                    <li><a href="/favorites">网址书签</a></li>
+                                                
+                                                    <li><a href="/study">学习</a></li>
+                                                
+                                                    <li><a href="/tools">工具</a></li>
+                                                
+                                                    <li><a href="/books">书单</a></li>
+                                                
+                                                    <li><a href="/life">生活</a></li>
+                                                
+                                                    <li><a href="/about">关于</a></li>
+                                                
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/img/touxiang.jpg" />
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="想要查找什么..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/">主页</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">归档</a></td>
+                
+                    <td><a class="main-nav-link" href="/categories">分类</a></td>
+                
+                    <td><a class="main-nav-link" href="/tags">标签</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/img/touxiang.jpg" />
+            <h2 id="name">Paul</h2>
+            <h3 id="title">专注于技术</h3>
+            <span id="location"><i class="fa fa-map-marker"></i>BeiJing, China</span>
+            <a id="follow" target="_blank" href="https://github.com/jibaole/">关注我</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                25
+                <span>文章</span>
+            </div>
+            <div class="article-info-block">
+                33
+                <span>标签</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="https://github.com/jibaole" target="_blank" title="github" class=tooltip>
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="mailto:jibaole@foxmail.com" target="_blank" title="envelope" class=tooltip>
+                            <i class="fa fa-envelope"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="https://gitee.com/jibaole.com" target="_blank" title="git" class=tooltip>
+                            <i class="fa fa-git"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/18501278945" target="_blank" title="wechat" class=tooltip>
+                            <i class="fa fa-wechat"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/atom.xml" target="_blank" title="rss" class=tooltip>
+                            <i class="fa fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-JVM-线上故障排查基本操作流程" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            JVM 线上故障排查基本操作流程
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2019/05/26/JVM-%E7%BA%BF%E4%B8%8A%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C%E6%B5%81%E7%A8%8B/">
+            <time datetime="2019-05-26T14:40:14.000Z" itemprop="datePublished">2019-05-26</time>
+        </a>
+    </div>
+
+
+                        
+    <div class="article-category">
+    	<i class="fa fa-folder"></i>
+        <a class="article-category-link" href="/categories/java/">Java</a>
+    </div>
+
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/jvm/" rel="tag">JVM</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>对于后端程序员，特别是 Java 程序员来讲，排查线上问题是不可避免的,各种 CPU 飚高，内存溢出，频繁 GC 等等，这些都是令人头疼的问题。楼主同样也遇到过这些问题，那么，遇到这些问题该如何解决呢？</p>
+<p>首先，出现问题，肯定要先定位问题所在，然后分析问题原因，再然后解决问题，最后进行总结，防止下次再次出现。</p>
+<p>今天的文章，就如我们的题目一样，讲的是基本操作，也就是一些排查线上问题的基本方法。为什么这么说呢？因为线上问题千奇百怪，就算是身经百战的专家也会遇到棘手的问题，因此不可能在一篇文章里说完，还有一个最重要的原因，当然就是楼主的水平不到位。</p>
+<p>但不到位归不到位，任何经验都是值得记录的，因此，楼主有必要将这些问题记录一下。</p>
+<p>还有，本文的排查环境是 Linux.</p>
+<a id="more"></a>
+
+<p><img src="https://blog-1255565289.cos.ap-beijing.myqcloud.com/image/20190526225740.png" alt=""></p>
+<h3 id="1-CPU-飚高"><a href="#1-CPU-飚高" class="headerlink" title="1. CPU 飚高"></a>1. CPU 飚高</h3><p>线上 CPU 飚高问题大家应该都遇到过，那么如何定位问题呢？</p>
+<p>思路：首先找到 CPU 飚高的那个 Java 进程，因为你的服务器会有多个 JVM 进程。然后找到那个进程中的 “问题线程”，最后根据线程堆栈信息找到问题代码。最后对代码进行排查。</p>
+<p>如何操作呢？</p>
+<p>通过 top 命令找到 CPU 消耗最高的进程，并记住进程 ID。<br>再次通过 top -Hp [进程 ID] 找到 CPU 消耗最高的线程 ID，并记住线程 ID.<br>通过 JDK 提供的 jstack 工具 dump 线程堆栈信息到指定文件中。具体命令：jstack -l [进程 ID] &gt;jstack.log。<br>由于刚刚的线程 ID 是十进制的，而堆栈信息中的线程 ID 是 16 进制的，因此我们需要将 10 进制的转换成 16 进制的，并用这个线程 ID 在堆栈中查找。使用 printf “%x\n” [十进制数字] ，可以将 10 进制转换成 16 进制。<br>通过刚刚转换的 16 进制数字从堆栈信息里找到对应的线程堆栈。就可以从该堆栈中看出端倪。<br>从楼主的经验来看，一般是某个业务死循环没有出口，这种情况可以根据业务进行修复。还有 C2 编译器执行编译时也会抢占 CPU，什么是 C2 编译器呢？当 Java 某一段代码执行次数超过 10000 次（默认）后，就会将该段代码从解释执行改为编译执行，也就是编译成机器码以提高速度。而这个 C2 编译器就是做这个的。如何解决呢？项目上线后，可以先通过压测工具进行预热，这样，等用户真正访问的时候，C2 编译器就不会干扰应用程序了。如果是 GC 线程导致的，那么极有可能是 Full GC ，那么就要进行 GC 的优化。</p>
+<h3 id="2-内存问题排查"><a href="#2-内存问题排查" class="headerlink" title="2. 内存问题排查"></a>2. 内存问题排查</h3><p>说完了 CPU 的问题排查，再说说内存的排查，通常，内存的问题就是 GC 的问题，因为 Java 的内存由 GC 管理。有 2 种情况，一种是内存溢出了，一种是内存没有溢出，但 GC 不健康。</p>
+<p>内存溢出的情况可以通过加上 -XX:+HeapDumpOnOutOfMemoryError 参数，该参数作用是：在程序内存溢出时输出 dump 文件。</p>
+<p>有了 dump 文件，就可以通过 dump 分析工具进行分析了，比如常用的 MAT，Jprofile，jvisualvm 等工具都可以分析，这些工具都能够看出到底是哪里溢出，哪里创建了大量的对象等等信息。</p>
+<p>第二种情况就比较复杂了。GC 的健康问题。</p>
+<p>通常一个健康的 GC 是什么状态呢？根据楼主的经验，YGC 5 秒一次左右，每次不超过 50 毫秒，FGC 最好没有，CMS GC 一天一次左右。</p>
+<p>而 GC 的优化有 2 个维度，一是频率，二是时长。</p>
+<p>我们看 YGC，首先看频率，如果 YGC 超过 5 秒一次，甚至更长，说明系统内存过大，应该缩小容量，如果频率很高，说明 Eden 区过小，可以将 Eden 区增大，但整个新生代的容量应该在堆的 30% - 40% 之间，eden，from 和 to 的比例应该在 8：1：1 左右，这个比例可根据对象晋升的大小进行调整。</p>
+<p>如果 YGC 时间过长呢？YGC 有 2 个过程，一个是扫描，一个是复制，通常扫描速度很快，复制速度相比而言要慢一些，如果每次都有大量对象要复制，就会将 STW 时间延长，还有一个情况就是 StringTable ，这个数据结构中存储着 String.intern 方法返回的常连池的引用，YGC 每次都会扫描这个数据结构（HashTable），如果这个数据结构很大，且没有经过 FGC，那么也会拉长 STW 时长，还有一种情况就是操作系统的虚拟内存，当 GC 时正巧操作系统正在交换内存，也会拉长 STW 时长。</p>
+<p>再来看看 FGC，实际上，FGC 我们只能优化频率，无法优化时长，因为这个时长无法控制。如何优化频率呢？</p>
+<p>首先，FGC 的原因有几个，1 是 Old 区内存不够，2 是元数据区内存不够，3 是 System.gc()， 4 是 jmap 或者 jcmd，5 是 CMS Promotion failed 或者 concurrent mode failure，6 JVM 基于悲观策略认为这次 YGC 后 Old 区无法容纳晋升的对象，因此取消 YGC，提前 FGC。</p>
+<p>通常优化的点是 Old 区内存不够导致 FGC。如果 FGC 后还有大量对象，说明 Old 区过小，应该扩大 Old 区，如果 FGC 后效果很好，说明 Old 区存在了大量短命的对象，优化的点应该是让这些对象在新生代就被 YGC 掉，通常的做法是增大新生代，如果有大而短命的对象，通过参数设置对象的大小，不要让这些对象进入 Old 区，还需要检查晋升年龄是否过小。如果 YGC 后，有大量对象因为无法进入 Survivor 区从而提前晋升，这时应该增大 Survivor 区，但不宜太大。</p>
+<p>上面说的都是优化的思路，我们也需要一些工具知道 GC 的状况。</p>
+<p>JDK 提供了很多的工具，比如 jmap ，jcmd 等，oracle 官方推荐使用 jcmd 代替 jmap，因为 jcmd 确实能代替 jmap 很多功能。jmap 可以打印对象的分布信息，可以 dump 文件，注意，jmap 和 jcmd dump 文件的时候会触发 FGC ，使用的时候注意场景。</p>
+<p>还有一个比较常用的工具是 jstat，该工具可以查看 GC 的详细信息，比如 eden ，from，to，old 等区域的内存使用情况。</p>
+<p>还有一个工具是 jinfo，该工具可以查看当前 jvm 使用了哪些参数，并且也可以在不停机的情况下修改参数。</p>
+<p>包括我们上面说的一些分析 dump 文件的可视化工具，MAT，Jprofile，jvisualvm 等，这些工具可以分析 jmap dump 下来的文件，看看哪个对象使用的内存较多，通常是能够查出问题的。</p>
+<p>还有很重要的一点就是，线上环境一定要带上 GC 日志！！！</p>
+<p>总结<br>基于文章的标题，我们这个是基本操作，故障排查是说不完的话题，每个故障涉及的知识也都很多，因此，我们在学习了基本的排查之后，还需要学习更多事故排查技术，比如排查 IO，网络，TCP 连接等等。楼主将在后面的文章中将这些基本操作都记录下来。</p>
+<p>good luck！！！！</p>
+<hr>
+<p>作者：stateis0</p>
+<p>原文链接：<a href="https://hacpai.com/article/1519403810488" target="_blank" rel="noopener">https://hacpai.com/article/1519403810488</a></p>
+<hr>
+
+        
+        </div>
+
+	<div id="donate" style="text-align:center">
+	<!-- 添加捐赠图标 -->
+<div class="post-donate" style="margin-bottom: 30px;margin-top: 10px;">
+    <div id="donate_board" class="donate_bar center">
+        <a id="btn_donate" class="btn_donate" href="javascript:;" title="donate"></a>
+        <span class="donate_txt">
+           欣赏此文？求鼓励，求支持！
+        </span>
+        <br>
+    </div>
+    <div id="donate_guide" class="donate_bar donate_bar2 center hidden">
+        <img src="/css/images/alipay.png" id="weixin" title="alipay doante" alt="alipay doante">
+        <img src="/css/images/wechatpay.png" title="wechatpay donate" id="zhifubao" alt="echatpay donate">
+    </div>
+    <script type="text/javascript">
+        $('#weixin').hover()
+        document.getElementById('btn_donate').onclick = function () {
+            $('#donate_board').addClass('hidden');
+            $('#donate_guide').removeClass('hidden');
+        }
+    </script>
+</div>
+	</div>
+
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+    <div class="bdsharebuttonbox">
+    <a href="#" class="bds_more" data-cmd="more">分享到：</a>
+    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间">QQ空间</a>
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博">新浪微博</a>
+    <a href="#" class="bds_tqq" data-cmd="tqq" title="分享到腾讯微博">腾讯微博</a>
+    <a href="#" class="bds_renren" data-cmd="renren" title="分享到人人网">人人网</a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信">微信</a>
+</div>
+<script>
+window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"16"},"share":{"bdSize":16}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+<style>
+    .bdshare_popup_box {
+        border-radius: 4px;
+        border: #e1e1e1 solid 1px;
+    }
+    .bdshare-button-style0-16 a,
+    .bdshare-button-style0-16 .bds_more {
+        padding-left: 20px;
+        margin: 6px 10px 6px 0;
+    }
+    .bdshare_dialog_list a,
+    .bdshare_popup_list a,
+    .bdshare_popup_bottom a {
+        font-family: 'Microsoft Yahei';
+    }
+    .bdshare_popup_top {
+        display: none;
+    }
+    .bdshare_popup_bottom {
+        height: auto;
+        padding: 5px;
+    }
+</style>
+
+
+</div>
+
+            
+    
+        <a href="http://www.jibaole.top/2019/05/26/JVM-%E7%BA%BF%E4%B8%8A%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C%E6%B5%81%E7%A8%8B/#comments" id="sourceId::2019/05/26/JVM-线上故障排查基本操作流程/" class="article-comment-link cy_cmt_count">评论</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+        <a href="/2019/05/27/%E8%AE%B0%E4%B8%80%E6%AC%A1%E7%BA%BF%E4%B8%8A%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5/" id="article-nav-newer" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">上一篇</strong>
+            <div class="article-nav-title">
+                
+                    记一次线上问题排查
+                
+            </div>
+        </a>
+    
+    
+        <a href="/2019/05/24/kafka-%E5%AE%89%E8%A3%85%E5%8F%8A%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">下一篇</strong>
+            <div class="article-nav-title">Kafka 安装及快速入门</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    
+        <section id="comments">
+    <div id="SOHUCS" sid="2019/05/26/JVM-线上故障排查基本操作流程/"></div>
+</section>
+    
+
+</section>
+            
+                
+<aside id="sidebar">
+   
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">最新文章</h3>
+        <div class="widget">
+            <ul id="recent-post" class="">
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2019/06/18/mysql%E6%9F%A5%E7%9C%8B%E9%94%81%E8%A1%A8%E5%9C%BA%E6%99%AF%E5%A4%84%E7%90%86/" class="thumbnail">
+    
+    
+        <span style="background-image:url(http://p22kojxuy.bkt.clouddn.com/Article/img/2018/01/tython.jpg)" alt="MySQL查看锁表场景处理" class="thumbnail-image"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2019/06/18/mysql%E6%9F%A5%E7%9C%8B%E9%94%81%E8%A1%A8%E5%9C%BA%E6%99%AF%E5%A4%84%E7%90%86/" class="title">MySQL查看锁表场景处理</a></p>
+                            <p class="item-date"><time datetime="2019-06-18T08:31:31.000Z" itemprop="datePublished">2019-06-18</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2019/05/27/%E8%AE%B0%E4%B8%80%E6%AC%A1%E7%BA%BF%E4%B8%8A%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5/" class="thumbnail">
+    
+    
+        <span style="background-image:url(https://blog-1255565289.cos.ap-beijing.myqcloud.com/image/20190526225740.png)" alt="记一次线上问题排查" class="thumbnail-image"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/java/">Java</a></p>
+                            <p class="item-title"><a href="/2019/05/27/%E8%AE%B0%E4%B8%80%E6%AC%A1%E7%BA%BF%E4%B8%8A%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5/" class="title">记一次线上问题排查</a></p>
+                            <p class="item-date"><time datetime="2019-05-27T12:06:21.000Z" itemprop="datePublished">2019-05-27</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2019/05/26/JVM-%E7%BA%BF%E4%B8%8A%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C%E6%B5%81%E7%A8%8B/" class="thumbnail">
+    
+    
+        <span style="background-image:url(https://blog-1255565289.cos.ap-beijing.myqcloud.com/image/20190526225740.png)" alt="JVM 线上故障排查基本操作流程" class="thumbnail-image"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/java/">Java</a></p>
+                            <p class="item-title"><a href="/2019/05/26/JVM-%E7%BA%BF%E4%B8%8A%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C%E6%B5%81%E7%A8%8B/" class="title">JVM 线上故障排查基本操作流程</a></p>
+                            <p class="item-date"><time datetime="2019-05-26T14:40:14.000Z" itemprop="datePublished">2019-05-26</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2019/05/24/kafka-%E5%AE%89%E8%A3%85%E5%8F%8A%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8/" class="thumbnail">
+    
+    
+        <span style="background-image:url(https://blog-1255565289.cos.ap-beijing.myqcloud.com/image/20190526225908.png)" alt="Kafka 安装及快速入门" class="thumbnail-image"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/%E4%B8%AD%E9%97%B4%E4%BB%B6/">中间件</a></p>
+                            <p class="item-title"><a href="/2019/05/24/kafka-%E5%AE%89%E8%A3%85%E5%8F%8A%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8/" class="title">Kafka 安装及快速入门</a></p>
+                            <p class="item-date"><time datetime="2019-05-24T05:01:38.000Z" itemprop="datePublished">2019-05-24</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2019/05/18/linux%E5%91%BD%E4%BB%A4%E4%B9%8Bless/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/linux/">Linux</a></p>
+                            <p class="item-title"><a href="/2019/05/18/linux%E5%91%BD%E4%BB%A4%E4%B9%8Bless/" class="title">Linux命令之Less</a></p>
+                            <p class="item-date"><time datetime="2019-05-18T04:17:07.000Z" itemprop="datePublished">2019-05-18</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">归档</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">五月 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">4</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签云</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/acid/" style="font-size: 10px;">ACID</a> <a href="/tags/alyunmq/" style="font-size: 10px;">AlYunMQ</a> <a href="/tags/base/" style="font-size: 10px;">BASE</a> <a href="/tags/cap/" style="font-size: 10px;">CAP</a> <a href="/tags/coding/" style="font-size: 10px;">Coding</a> <a href="/tags/git/" style="font-size: 15px;">Git</a> <a href="/tags/github/" style="font-size: 10px;">GitHub</a> <a href="/tags/hexo/" style="font-size: 15px;">Hexo</a> <a href="/tags/intellij-idea/" style="font-size: 10px;">Intellij Idea</a> <a href="/tags/java/" style="font-size: 10px;">JAVA</a> <a href="/tags/jdk8/" style="font-size: 10px;">JDK8</a> <a href="/tags/jvm/" style="font-size: 10px;">JVM</a> <a href="/tags/jenkins/" style="font-size: 15px;">Jenkins</a> <a href="/tags/kafka/" style="font-size: 10px;">Kafka</a> <a href="/tags/linux/" style="font-size: 20px;">Linux</a> <a href="/tags/mq/" style="font-size: 10px;">MQ</a> <a href="/tags/mac/" style="font-size: 10px;">Mac</a> <a href="/tags/map/" style="font-size: 10px;">Map</a> <a href="/tags/markdown/" style="font-size: 10px;">Markdown</a> <a href="/tags/mysql/" style="font-size: 10px;">MySQL</a> <a href="/tags/redis/" style="font-size: 10px;">Redis</a> <a href="/tags/webmagic/" style="font-size: 10px;">WebMagic</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/osn/" style="font-size: 10px;">osn</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/%E4%BA%92%E8%81%94%E7%BD%91/" style="font-size: 15px;">互联网</a> <a href="/tags/%E4%BC%98%E5%8C%96/" style="font-size: 10px;">优化</a> <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F/" style="font-size: 10px;">分布式</a> <a href="/tags/%E5%91%BD%E4%BB%A4/" style="font-size: 10px;">命令</a> <a href="/tags/%E5%B7%A5%E5%85%B7/" style="font-size: 10px;">工具</a> <a href="/tags/%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/" style="font-size: 10px;">开发工具</a> <a href="/tags/%E7%88%AC%E8%99%AB/" style="font-size: 10px;">爬虫</a> <a href="/tags/%E8%A1%8C%E8%AF%9D/" style="font-size: 10px;">行话</a>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">链接</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a href="http://hexo.io"  target="_blank">Hexo</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://zoufeng.net/"  target="_blank">foam | 我一直在找寻有你的世界</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://www.luojiawei.me/"  target="_blank">getNway的博客</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://hclab.cn/hclab/index.php/"  target="_blank">HCLAB-环宇创意电脑工作室</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+
+            
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2020 Paul<br>
+             <a  href="http://www.jibaole.top/" target="_blank">吉保乐</a>   <a href="http://beian.miit.gov.cn" target="_blank">京ICP备19023154号-1</a> <a href="http://github.com/jibaole/" target="_blank" rel="noopener">专注|技术</a>
+        </div>
+    </div>
+</footer>
+        
+    
+    <script id="cy_cmt_num" src="https://changyan.sohu.com/upload/plugins/plugins.list.count.js?clientId=cytonBPwX"></script>
+    <script charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/changyan.js" ></script>
+    <script type="text/javascript">
+    window.changyan.api.config({
+    appid: 'cytonBPwX',
+    conf: '1b66209a6513b68c97b0e6a412323593'
+    });
+    </script>
+
+
+
+
+    
+        
+<script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-share.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-video.min.js"></script>
+
+    
+    
+        
+<script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+
+    
+    
+
+
+
+<!-- Custom Scripts -->
+
+<script src="/js/main.js"></script>
+
+
+    </div>
+</body>
+</html>

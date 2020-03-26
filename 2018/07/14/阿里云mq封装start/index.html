@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <meta charset="utf-8">
+    
+    <title>阿里云MQ封装start | Paul code</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="消息队列（Message Queue，简称MQ）是企业级互联网架构的核心产品，服务于整个阿里巴巴集团已超过 10 年，经过阿里巴巴交易核心链路反复打磨与历年双十一购物狂欢节的严苛考验，是一个真正具备低延迟、高并发、高可用、高可靠，可支撑万亿级数据洪峰的分布式消息中间件。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="阿里云MQ封装start">
+<meta property="og:url" content="http://www.jibaole.top/2018/07/14/%E9%98%BF%E9%87%8C%E4%BA%91mq%E5%B0%81%E8%A3%85start/index.html">
+<meta property="og:site_name" content="Paul code">
+<meta property="og:description" content="消息队列（Message Queue，简称MQ）是企业级互联网架构的核心产品，服务于整个阿里巴巴集团已超过 10 年，经过阿里巴巴交易核心链路反复打磨与历年双十一购物狂欢节的严苛考验，是一个真正具备低延迟、高并发、高可用、高可靠，可支撑万亿级数据洪峰的分布式消息中间件。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://p22kojxuy.bkt.clouddn.com/20180909175330.png?from=isbolg">
+<meta property="article:published_time" content="2018-07-14T14:33:35.000Z">
+<meta property="article:modified_time" content="2020-03-26T09:19:17.735Z">
+<meta property="article:author" content="Paul">
+<meta property="article:tag" content="osn">
+<meta property="article:tag" content="AlYunMQ">
+<meta property="article:tag" content="MQ">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://p22kojxuy.bkt.clouddn.com/20180909175330.png?from=isbolg">
+    
+
+    
+        <link rel="alternate" href="/atom.xml" title="Paul code" type="application/atom+xml" />
+    
+
+    
+        <link rel="icon" href="/img/toux.png" />
+    
+
+    
+<link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+
+    
+<link rel="stylesheet" href="/libs/open-sans/styles.css">
+
+    
+<link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+    
+<link rel="stylesheet" href="/libs/bootstrap/css/bootstrap.min.css">
+
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+<script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+
+    
+<script src="/libs/bootstrap/js/bootstrap.min.js"></script>
+
+    
+    
+        
+<link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+
+    
+    
+        
+<link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+
+    
+    
+        <script type="text/javascript">
+(function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-111707541-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+    
+    
+    
+        <script>
+var _hmt = _hmt || [];
+(function() {
+    var hm = document.createElement("script");
+    hm.src = "//hm.baidu.com/hm.js?095ffb1d0ab8973dcab22bc6c6c9ee59";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+    
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">Paul code</span>
+            </a>
+            <nav id="main-nav">
+                <div>
+                                    <ul class="nav navbar-nav">
+                                        
+                                            <a class="main-nav-link" href="/">主页</a>
+                                        
+                                            <a class="main-nav-link" href="/archives">归档</a>
+                                        
+                                            <a class="main-nav-link" href="/categories">分类</a>
+                                        
+                                            <a class="main-nav-link" href="/tags">标签</a>
+                                        
+                                        <li class="dropdown">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                                更多
+                                                <b class="caret"></b>
+                                            </a>
+                                            <ul class="dropdown-menu">
+                                                
+                                                    <li><a href="/favorites">网址书签</a></li>
+                                                
+                                                    <li><a href="/study">学习</a></li>
+                                                
+                                                    <li><a href="/tools">工具</a></li>
+                                                
+                                                    <li><a href="/books">书单</a></li>
+                                                
+                                                    <li><a href="/life">生活</a></li>
+                                                
+                                                    <li><a href="/about">关于</a></li>
+                                                
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/img/touxiang.jpg" />
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="想要查找什么..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/">主页</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">归档</a></td>
+                
+                    <td><a class="main-nav-link" href="/categories">分类</a></td>
+                
+                    <td><a class="main-nav-link" href="/tags">标签</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/img/touxiang.jpg" />
+            <h2 id="name">Paul</h2>
+            <h3 id="title">专注于技术</h3>
+            <span id="location"><i class="fa fa-map-marker"></i>BeiJing, China</span>
+            <a id="follow" target="_blank" href="https://github.com/jibaole/">关注我</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                25
+                <span>文章</span>
+            </div>
+            <div class="article-info-block">
+                33
+                <span>标签</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="https://github.com/jibaole" target="_blank" title="github" class=tooltip>
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="mailto:jibaole@foxmail.com" target="_blank" title="envelope" class=tooltip>
+                            <i class="fa fa-envelope"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="https://gitee.com/jibaole.com" target="_blank" title="git" class=tooltip>
+                            <i class="fa fa-git"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/18501278945" target="_blank" title="wechat" class=tooltip>
+                            <i class="fa fa-wechat"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/atom.xml" target="_blank" title="rss" class=tooltip>
+                            <i class="fa fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-阿里云mq封装start" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            阿里云MQ封装start
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2018/07/14/%E9%98%BF%E9%87%8C%E4%BA%91mq%E5%B0%81%E8%A3%85start/">
+            <time datetime="2018-07-14T14:33:35.000Z" itemprop="datePublished">2018-07-14</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/alyunmq/" rel="tag">AlYunMQ</a>, <a class="tag-link" href="/tags/mq/" rel="tag">MQ</a>, <a class="tag-link" href="/tags/osn/" rel="tag">osn</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+                <div id="toc" class="toc-article">
+                <strong class="toc-title">文章目录</strong>
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#基于aliyun-MQ服务封装的SpringBoot-starter"><span class="toc-number">1.</span> <span class="toc-text">基于aliyun MQ服务封装的SpringBoot starter</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#一、RocketMQ相关说明"><span class="toc-number">1.1.</span> <span class="toc-text">一、RocketMQ相关说明</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#二、接入概要说明"><span class="toc-number">1.2.</span> <span class="toc-text">二、接入概要说明</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#三、starter的基本用法："><span class="toc-number">1.3.</span> <span class="toc-text">三、starter的基本用法：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#相关参考"><span class="toc-number">1.4.</span> <span class="toc-text">相关参考</span></a></li></ol></li></ol>
+                </div>
+            
+            <blockquote>
+<p>消息队列（Message Queue，简称MQ）是企业级互联网架构的核心产品，服务于整个阿里巴巴集团已超过 10 年，经过阿里巴巴交易核心链路反复打磨与历年双十一购物狂欢节的严苛考验，是一个真正具备低延迟、高并发、高可用、高可靠，可支撑万亿级数据洪峰的分布式消息中间件。</p>
+</blockquote>
+<a id="more"></a>
+
+<h2 id="基于aliyun-MQ服务封装的SpringBoot-starter"><a href="#基于aliyun-MQ服务封装的SpringBoot-starter" class="headerlink" title="基于aliyun MQ服务封装的SpringBoot starter"></a>基于aliyun MQ服务封装的SpringBoot starter</h2><h3 id="一、RocketMQ相关说明"><a href="#一、RocketMQ相关说明" class="headerlink" title="一、RocketMQ相关说明"></a>一、RocketMQ相关说明</h3><ul>
+<li>快速入门：<a href="https://help.aliyun.com/document_detail/34411.html" target="_blank" rel="noopener">https://help.aliyun.com/document_detail/34411.html</a></li>
+<li><a href="https://help.aliyun.com/document_detail/49323.html?spm=a2c4g.11186623.6.602.HOqOX3" target="_blank" rel="noopener">收发顺序消息</a></li>
+<li><a href="https://help.aliyun.com/document_detail/29548.html?spm=a2c4g.11186623.6.603.LFUtTE" target="_blank" rel="noopener">收发事务消息</a></li>
+<li><a href="https://help.aliyun.com/document_detail/29549.html?spm=a2c4g.11186623.6.604.sCq6lR" target="_blank" rel="noopener">收发延时消息</a></li>
+<li><a href="https://help.aliyun.com/document_detail/29550.html?spm=a2c4g.11186623.6.605.Pxqkpc" target="_blank" rel="noopener">收发定时消息</a></li>
+</ul>
+<blockquote>
+<p>RocketMQ 物理部署结构</p>
+</blockquote>
+<p><img src="https://ws2.sinaimg.cn/large/006tNc79ly1ft2r4zpl2aj31kw0xnq65.jpg" alt=""></p>
+<blockquote>
+<p>RocketMQ 网络部署特点</p>
+</blockquote>
+<ul>
+<li><p>Name Server 是一个几乎无状态节点，可集群部署，节点之间无任何信息同步。</p>
+</li>
+<li><p>Broker 部署相对复杂，Broker 分为 Master 与 Slave，一个 Master 可以对应多个 Slave，但是一个 Slave 只能对应一个 Master，Master 与 Slave<br>的对应关系通过指定相同的 BrokerName，不同的 BrokerId 来定义，BrokerId为 0 表示 Master，非 0 表示 Slave。Master 也可以部署多个。每个 Broker<br>与Name Server 集群中的所有节点建立长连接，定时注册 Topic 信息到所有 Name Server。</p>
+</li>
+<li><p>Producer 与 Name Server 集群中的其中一个节点(随机选择)建立长连接，定期从 Name Server 取 Topic 路由信息，并向提供 Topic 服务的 Master<br>建立长连接，且定时向 Master 发送心跳。Producer 完全无状态，可集群部署。</p>
+</li>
+<li><p>Consumer 与 Name Server 集群中的其中一个节点(随机选择)建立长连接，定期从 Name Server 取 Topic 路由信息，并向提供 Topic 服务的 Master、<br>Slave 建立长连接，且定时向 Master、Slave 发送心跳。Consumer 既可以从 Master 订阅消息，也可以从 Slave 订阅消息，订阅规则由 Broker 配置决定。  </p>
+</li>
+</ul>
+<h3 id="二、接入概要说明"><a href="#二、接入概要说明" class="headerlink" title="二、接入概要说明"></a>二、接入概要说明</h3><blockquote>
+<p>1、通用参数说明</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>参数说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>onsAddr</td>
+<td>设置 MQ TCP 协议接入点，参考上面表格（推荐）</td>
+</tr>
+<tr>
+<td>AccessKey</td>
+<td>您在阿里云账号管理控制台中创建的 AccessKey，用于身份认证</td>
+</tr>
+<tr>
+<td>SecretKey</td>
+<td>您在阿里云账号管理控制台中创建的 SecretKey，用于身份认证</td>
+</tr>
+<tr>
+<td>producerId</td>
+<td>您在阿里云账号管理控制台中创建的producerId,用户发送消息</td>
+</tr>
+<tr>
+<td>consumerId</td>
+<td>您在阿里云账号管理控制台中创建的consumerId,用户订阅消息</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>2、发送消息参数说明</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>参数说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ProducerId</td>
+<td>您在控制台创建的 Producer ID</td>
+</tr>
+<tr>
+<td>SendMsgTimeoutMillis</td>
+<td>设置消息发送的超时时间，单位（毫秒），默认：3000</td>
+</tr>
+<tr>
+<td>CheckImmunityTimeInSeconds（事务消息）</td>
+<td>设置事务消息第一次回查的最快时间，单位（秒）</td>
+</tr>
+<tr>
+<td>shardingKey（顺序消息）</td>
+<td>顺序消息中用来计算不同分区的值</td>
+</tr>
+</tbody></table>
+<p><img src="http://om9j2ardo.bkt.clouddn.com/QQ%E5%9B%BE%E7%89%8720180607122953.png" alt="image"></p>
+<blockquote>
+<p>3、订阅消息参数说明</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>参数说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ConsumerId</td>
+<td>您在 MQ 控制台上创建的 Consumer ID</td>
+</tr>
+<tr>
+<td>MessageModel</td>
+<td>设置 Consumer 实例的消费模式，默认为集群消费（值：CLUSTERING）;广播消费（BROADCASTING）</td>
+</tr>
+<tr>
+<td>ConsumeThreadNums</td>
+<td>设置 Consumer 实例的消费线程数，默认：64</td>
+</tr>
+<tr>
+<td>MaxReconsumeTimes</td>
+<td>设置消息消费失败的最大重试次数，默认：16</td>
+</tr>
+<tr>
+<td>ConsumeTimeout</td>
+<td>设置每条消息消费的最大超时时间，超过设置时间则被视为消费失败，等下次重新投递再次消费。每个业务需要设置一个合理的值，单位（分钟）。默认：15</td>
+</tr>
+<tr>
+<td>suspendTimeMillis</td>
+<td>（顺序消息）    只适用于顺序消息，设置消息消费失败的重试间隔时间</td>
+</tr>
+</tbody></table>
+<p><img src="http://om9j2ardo.bkt.clouddn.com/QQ%E5%9B%BE%E7%89%8720180607122207.png" alt="image"></p>
+<blockquote>
+<p>4、TCP协议接入域名</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>环境说明</th>
+<th>接入点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>公共云内网接入</td>
+<td>（阿里云经典网络/VPC）：</td>
+</tr>
+<tr>
+<td>华东1、华东2、华北1、华北2、华南1、香港</td>
+<td><a href="http://onsaddr-internal.aliyun.com:8080/rocketmq/nsaddr4client-internal" target="_blank" rel="noopener">http://onsaddr-internal.aliyun.com:8080/rocketmq/nsaddr4client-internal</a></td>
+</tr>
+<tr>
+<td>公共云公网接入（非阿里云选择这个）</td>
+<td><a href="http://onsaddr-internet.aliyun.com/rocketmq/nsaddr4client-internet" target="_blank" rel="noopener">http://onsaddr-internet.aliyun.com/rocketmq/nsaddr4client-internet</a></td>
+</tr>
+<tr>
+<td>公共云 Region：亚太东南1(新加坡)</td>
+<td><a href="http://ap-southeastaddr-internal.aliyun.com:8080/rocketmq/nsaddr4client-internal" target="_blank" rel="noopener">http://ap-southeastaddr-internal.aliyun.com:8080/rocketmq/nsaddr4client-internal</a></td>
+</tr>
+<tr>
+<td>公共云 Region：亚太东南3(吉隆坡)</td>
+<td><a href="http://ons-ap-southeast-3-internal.aliyun.com:8080/rocketmq/nsaddr4client-internal" target="_blank" rel="noopener">http://ons-ap-southeast-3-internal.aliyun.com:8080/rocketmq/nsaddr4client-internal</a></td>
+</tr>
+<tr>
+<td>公共云 Region：亚太东北 1 (东京)</td>
+<td><a href="http://ons-ap-northeast-1-internal.aliyun.com:8080/rocketmq/nsaddr4client-internal" target="_blank" rel="noopener">http://ons-ap-northeast-1-internal.aliyun.com:8080/rocketmq/nsaddr4client-internal</a></td>
+</tr>
+<tr>
+<td>金融云 Region：华东1</td>
+<td><a href="http://jbponsaddr-internal.aliyun.com:8080/rocketmq/nsaddr4client-internal" target="_blank" rel="noopener">http://jbponsaddr-internal.aliyun.com:8080/rocketmq/nsaddr4client-internal</a></td>
+</tr>
+<tr>
+<td>金融云 Region：华东2、华南1</td>
+<td><a href="http://mq4finance-sz.addr.aliyun.com:8080/rocketmq/nsaddr4client-internal" target="_blank" rel="noopener">http://mq4finance-sz.addr.aliyun.com:8080/rocketmq/nsaddr4client-internal</a></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>5、产品费用详情</p>
+</blockquote>
+<p><img src="http://pacssnntv.bkt.clouddn.com/20180709100117.png" alt="MQ费用详细"></p>
+<h3 id="三、starter的基本用法："><a href="#三、starter的基本用法：" class="headerlink" title="三、starter的基本用法："></a>三、starter的基本用法：</h3><blockquote>
+<p>1、pom.xml引入依赖</p>
+</blockquote>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>cn.knowbox.book<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-alimq<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0.0.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+<blockquote>
+<p>2、application配置文件中添加相应配置</p>
+</blockquote>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">aliyun.mq.onsAddr</span>=<span class="string">http://onsaddr-internet.aliyun.com/rocketmq/nsaddr4client-internet</span></span><br><span class="line"><span class="meta">aliyun.mq.accessKey</span>=<span class="string">xxxxxxx</span></span><br><span class="line"><span class="meta">aliyun.mq.secretKey</span>=<span class="string">xxxxxx</span></span><br><span class="line"><span class="comment">#为false表示不引入producer，为true则producerId必须提供</span></span><br><span class="line"><span class="meta">aliyun.mq.producer.enabled</span>=<span class="string">true</span></span><br><span class="line"><span class="meta">aliyun.mq.producer.producerId</span>=<span class="string">PID_PRODUCER_SMS </span></span><br><span class="line"><span class="comment">#为false表示不引入consumer，为true则consumerId必须提供</span></span><br><span class="line"><span class="meta">aliyun.mq.consumer.enabled</span>=<span class="string">true</span></span><br><span class="line"><span class="meta">aliyun.mq.consumer.consumerId</span>=<span class="string">CID_CONSUMER_SMS</span></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<blockquote>
+<p>3、 使用producer只需要在相应类中依需要注入对应实例</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> jibaole</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@version</span> 1.0</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@desc</span> 生产者-通用方法</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2018/7/7 下午5:19</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Slf</span>4j</span><br><span class="line"><span class="meta">@SuppressWarnings</span>(&#123;<span class="string">"WeakerAccess"</span>, <span class="string">"unused"</span>&#125;)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RocketMQTemplate</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Resource</span></span><br><span class="line">    <span class="keyword">private</span> ProducerBean producer;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/****</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@Description</span>: 同步发送</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@Param</span>: [event]</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@Author</span>: jibaole</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> SendResult <span class="title">send</span><span class="params">(MessageEvent event)</span> </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/****</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@Description</span>: 同步发送(带延迟时间)</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@Param</span>: [event, delay]</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@Author</span>: jibaole</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> SendResult <span class="title">send</span><span class="params">(MessageEvent event, <span class="keyword">long</span> delay)</span> </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@Description</span>: 单向发送</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@Param</span>: [event]</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@Author</span>: jibaole</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sendOneway</span><span class="params">(MessageEvent event)</span> </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@Description</span>: 异步发送</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@Param</span>: [event]</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@Author</span>: jibaole</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sendAsync</span><span class="params">(MessageEvent event)</span> </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@Description</span>: 异步发送(带延迟时间)</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@Param</span>: [event, delay]</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@Author</span>: jibaole</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sendAsync</span><span class="params">(MessageEvent event, <span class="keyword">long</span> delay)</span> </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ALiService</span> </span>&#123;</span><br><span class="line">	 <span class="meta">@Autowired</span></span><br><span class="line">   <span class="keyword">private</span> RocketMQTemplate rocketMQTemplate;</span><br><span class="line">   </span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 普通消息生产者-调用</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sentMsg</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">/**封装消息*/</span></span><br><span class="line">        MessageEvent event = <span class="keyword">new</span> MessageEvent();</span><br><span class="line">        event.setTopic(<span class="string">"base_sms"</span>);</span><br><span class="line">        event.setTag(<span class="string">"Tag_user"</span>);</span><br><span class="line">       </span><br><span class="line">        User user = <span class="keyword">new</span> User();</span><br><span class="line">        user.setName(<span class="string">"Paul"</span>);</span><br><span class="line">        user.setAdds(<span class="string">"北京市 昌平区 龙锦苑东二区"</span>);</span><br><span class="line">         <span class="comment">/**封装任意类型领域对象*/</span></span><br><span class="line">        event.setDomain(user);</span><br><span class="line">        </span><br><span class="line">        rocketMQTemplate.send(event);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ALiService</span> </span>&#123;</span><br><span class="line">	 <span class="meta">@Autowired</span></span><br><span class="line">   <span class="keyword">private</span> OrderMessageTemplate rocketMQTemplate;</span><br><span class="line">   </span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 顺序消息生产者-调用</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sentMsg</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">/**封装消息*/</span></span><br><span class="line">        MessageEvent event = <span class="keyword">new</span> MessageEvent();</span><br><span class="line">        event.setTopic(<span class="string">"base_sms"</span>);</span><br><span class="line">        event.setTag(<span class="string">"Tag_user"</span>);</span><br><span class="line">       </span><br><span class="line">        User user = <span class="keyword">new</span> User();</span><br><span class="line">        user.setName(<span class="string">"Paul"</span>);</span><br><span class="line">        user.setAdds(<span class="string">"北京市 昌平区 龙锦苑东二区"</span>);</span><br><span class="line">         <span class="comment">/**封装任意类型领域对象*/</span></span><br><span class="line">        event.setDomain(user);</span><br><span class="line">        </span><br><span class="line">        rocketMQTemplate.send(event);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ALiService</span> </span>&#123;</span><br><span class="line">	<span class="meta">@Autowired</span></span><br><span class="line">	<span class="keyword">private</span> TransactionMessageTemplate transactionMessageTemplate;</span><br><span class="line">	</span><br><span class="line">  <span class="meta">@PostConstruct</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="comment">//发事务消息前需要初始化LocalTransactionCheckerImpl</span></span><br><span class="line">		transactionMessageTemplate.init(<span class="keyword">new</span> TransactionChecker() &#123;</span><br><span class="line">			</span><br><span class="line">			<span class="meta">@Override</span></span><br><span class="line">			<span class="function"><span class="keyword">public</span> TransactionStatus <span class="title">check</span><span class="params">(MessageEvent messageEvent, Long hashValue)</span> </span>&#123;</span><br><span class="line">				TransactionStatus status = TransactionDemo.checker();</span><br><span class="line">				System.out.println(<span class="string">"sysout TransactionChecker.check 方法被调用:"</span>+JSON.toJSONString(messageEvent));</span><br><span class="line">				<span class="keyword">return</span> status;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;);</span><br><span class="line">		log.info(<span class="string">"初始化 LocalTransactionChecker 完成"</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 事务消息生产者-调用</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sentMsg</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">/**封装消息*/</span></span><br><span class="line">        MessageEvent event = <span class="keyword">new</span> MessageEvent();</span><br><span class="line">        event.setTopic(<span class="string">"base_sms"</span>);</span><br><span class="line">        event.setTag(<span class="string">"Tag_user"</span>);</span><br><span class="line">       </span><br><span class="line">        User user = <span class="keyword">new</span> User();</span><br><span class="line">        user.setName(<span class="string">"Paul"</span>);</span><br><span class="line">        user.setAdds(<span class="string">"北京市 昌平区 龙锦苑东二区"</span>);</span><br><span class="line">         <span class="comment">/**封装任意类型领域对象*/</span></span><br><span class="line">        event.setDomain(user);</span><br><span class="line">        </span><br><span class="line">        transactionMessageTemplate.send(event,<span class="keyword">new</span> TransactionExecuter() &#123;</span><br><span class="line">			</span><br><span class="line">					<span class="meta">@Override</span></span><br><span class="line">					<span class="function"><span class="keyword">public</span> TransactionStatus <span class="title">executer</span><span class="params">(MessageEvent messageEvent, Long hashValue, Object arg)</span> </span>&#123;</span><br><span class="line">						String transactionId = TransactionDemo.createTransaction();</span><br><span class="line">						TransactionStatus status = TransactionDemo.checker();</span><br><span class="line">						<span class="keyword">return</span> status;</span><br><span class="line">					&#125;</span><br><span class="line">				),<span class="string">"参数对象,以本字符串示例,会传递给TransactionExecuter.executer"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>4、 consumer监听处理类实现，继承AbstractMessageListener类，实现handle方法即可，如：</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> jibaole</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@version</span> 1.0</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@desc</span> 用户事件监听处理</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@date</span> 2018/7/5 上午11:18</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="meta">@RocketMQMessageListener</span>(topic = <span class="string">"base_sms"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserMessageListener</span> <span class="keyword">extends</span> <span class="title">AbstractMessageListener</span>&lt;<span class="title">User</span>&gt; </span>&#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 消息处理</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handle</span><span class="params">(User user)</span> </span>&#123;</span><br><span class="line">        System.out.println(user <span class="keyword">instanceof</span> User);</span><br><span class="line"></span><br><span class="line">        System.out.println(user.toString());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>topic为必填，可以配置多个不同topic监听业务处理</li>
+</ul>
+<blockquote>
+<p>5、优点</p>
+</blockquote>
+<ul>
+<li>1、 使用简单：开箱即用,只需要简单配置</li>
+<li>2、分业务处理：针对同一topic、通过tag区分具体业务场景。        </li>
+</ul>
+<h3 id="相关参考"><a href="#相关参考" class="headerlink" title="相关参考"></a>相关参考</h3><hr>
+<ul>
+<li>官网Demo地址：<a href="https://github.com/AliwareMQ/mq-demo" target="_blank" rel="noopener">https://github.com/AliwareMQ/mq-demo</a></li>
+<li>Apache的starter：<a href="https://github.com/apache/rocketmq-externals/tree/master/rocketmq-spring-boot-starter" target="_blank" rel="noopener">https://github.com/apache/rocketmq-externals/tree/master/rocketmq-spring-boot-starter</a></li>
+</ul>
+
+        
+        </div>
+
+	<div id="donate" style="text-align:center">
+	<!-- 添加捐赠图标 -->
+<div class="post-donate" style="margin-bottom: 30px;margin-top: 10px;">
+    <div id="donate_board" class="donate_bar center">
+        <a id="btn_donate" class="btn_donate" href="javascript:;" title="donate"></a>
+        <span class="donate_txt">
+           欣赏此文？求鼓励，求支持！
+        </span>
+        <br>
+    </div>
+    <div id="donate_guide" class="donate_bar donate_bar2 center hidden">
+        <img src="/css/images/alipay.png" id="weixin" title="alipay doante" alt="alipay doante">
+        <img src="/css/images/wechatpay.png" title="wechatpay donate" id="zhifubao" alt="echatpay donate">
+    </div>
+    <script type="text/javascript">
+        $('#weixin').hover()
+        document.getElementById('btn_donate').onclick = function () {
+            $('#donate_board').addClass('hidden');
+            $('#donate_guide').removeClass('hidden');
+        }
+    </script>
+</div>
+	</div>
+
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+    <div class="bdsharebuttonbox">
+    <a href="#" class="bds_more" data-cmd="more">分享到：</a>
+    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间">QQ空间</a>
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博">新浪微博</a>
+    <a href="#" class="bds_tqq" data-cmd="tqq" title="分享到腾讯微博">腾讯微博</a>
+    <a href="#" class="bds_renren" data-cmd="renren" title="分享到人人网">人人网</a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信">微信</a>
+</div>
+<script>
+window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"16"},"share":{"bdSize":16}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+<style>
+    .bdshare_popup_box {
+        border-radius: 4px;
+        border: #e1e1e1 solid 1px;
+    }
+    .bdshare-button-style0-16 a,
+    .bdshare-button-style0-16 .bds_more {
+        padding-left: 20px;
+        margin: 6px 10px 6px 0;
+    }
+    .bdshare_dialog_list a,
+    .bdshare_popup_list a,
+    .bdshare_popup_bottom a {
+        font-family: 'Microsoft Yahei';
+    }
+    .bdshare_popup_top {
+        display: none;
+    }
+    .bdshare_popup_bottom {
+        height: auto;
+        padding: 5px;
+    }
+</style>
+
+
+</div>
+
+            
+    
+        <a href="http://www.jibaole.top/2018/07/14/%E9%98%BF%E9%87%8C%E4%BA%91mq%E5%B0%81%E8%A3%85start/#comments" id="sourceId::2018/07/14/阿里云mq封装start/" class="article-comment-link cy_cmt_count">评论</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+        <a href="/2018/09/08/mac-%E5%B8%B8%E7%94%A8%E8%BD%AF%E4%BB%B6%E6%95%B4%E7%90%86/" id="article-nav-newer" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">上一篇</strong>
+            <div class="article-nav-title">
+                
+                    Mac-常用软件整理
+                
+            </div>
+        </a>
+    
+    
+        <a href="/2018/04/28/hashmap%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">下一篇</strong>
+            <div class="article-nav-title">HashMap源码分析</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    
+        <section id="comments">
+    <div id="SOHUCS" sid="2018/07/14/阿里云mq封装start/"></div>
+</section>
+    
+
+</section>
+            
+                
+<aside id="sidebar">
+   
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">最新文章</h3>
+        <div class="widget">
+            <ul id="recent-post" class="">
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2019/06/18/mysql%E6%9F%A5%E7%9C%8B%E9%94%81%E8%A1%A8%E5%9C%BA%E6%99%AF%E5%A4%84%E7%90%86/" class="thumbnail">
+    
+    
+        <span style="background-image:url(http://p22kojxuy.bkt.clouddn.com/Article/img/2018/01/tython.jpg)" alt="MySQL查看锁表场景处理" class="thumbnail-image"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2019/06/18/mysql%E6%9F%A5%E7%9C%8B%E9%94%81%E8%A1%A8%E5%9C%BA%E6%99%AF%E5%A4%84%E7%90%86/" class="title">MySQL查看锁表场景处理</a></p>
+                            <p class="item-date"><time datetime="2019-06-18T08:31:31.000Z" itemprop="datePublished">2019-06-18</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2019/05/27/%E8%AE%B0%E4%B8%80%E6%AC%A1%E7%BA%BF%E4%B8%8A%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5/" class="thumbnail">
+    
+    
+        <span style="background-image:url(https://blog-1255565289.cos.ap-beijing.myqcloud.com/image/20190526225740.png)" alt="记一次线上问题排查" class="thumbnail-image"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/java/">Java</a></p>
+                            <p class="item-title"><a href="/2019/05/27/%E8%AE%B0%E4%B8%80%E6%AC%A1%E7%BA%BF%E4%B8%8A%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5/" class="title">记一次线上问题排查</a></p>
+                            <p class="item-date"><time datetime="2019-05-27T12:06:21.000Z" itemprop="datePublished">2019-05-27</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2019/05/26/JVM-%E7%BA%BF%E4%B8%8A%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C%E6%B5%81%E7%A8%8B/" class="thumbnail">
+    
+    
+        <span style="background-image:url(https://blog-1255565289.cos.ap-beijing.myqcloud.com/image/20190526225740.png)" alt="JVM 线上故障排查基本操作流程" class="thumbnail-image"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/java/">Java</a></p>
+                            <p class="item-title"><a href="/2019/05/26/JVM-%E7%BA%BF%E4%B8%8A%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C%E6%B5%81%E7%A8%8B/" class="title">JVM 线上故障排查基本操作流程</a></p>
+                            <p class="item-date"><time datetime="2019-05-26T14:40:14.000Z" itemprop="datePublished">2019-05-26</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2019/05/24/kafka-%E5%AE%89%E8%A3%85%E5%8F%8A%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8/" class="thumbnail">
+    
+    
+        <span style="background-image:url(https://blog-1255565289.cos.ap-beijing.myqcloud.com/image/20190526225908.png)" alt="Kafka 安装及快速入门" class="thumbnail-image"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/%E4%B8%AD%E9%97%B4%E4%BB%B6/">中间件</a></p>
+                            <p class="item-title"><a href="/2019/05/24/kafka-%E5%AE%89%E8%A3%85%E5%8F%8A%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8/" class="title">Kafka 安装及快速入门</a></p>
+                            <p class="item-date"><time datetime="2019-05-24T05:01:38.000Z" itemprop="datePublished">2019-05-24</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2019/05/18/linux%E5%91%BD%E4%BB%A4%E4%B9%8Bless/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/linux/">Linux</a></p>
+                            <p class="item-title"><a href="/2019/05/18/linux%E5%91%BD%E4%BB%A4%E4%B9%8Bless/" class="title">Linux命令之Less</a></p>
+                            <p class="item-date"><time datetime="2019-05-18T04:17:07.000Z" itemprop="datePublished">2019-05-18</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">归档</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">五月 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">4</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签云</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/acid/" style="font-size: 10px;">ACID</a> <a href="/tags/alyunmq/" style="font-size: 10px;">AlYunMQ</a> <a href="/tags/base/" style="font-size: 10px;">BASE</a> <a href="/tags/cap/" style="font-size: 10px;">CAP</a> <a href="/tags/coding/" style="font-size: 10px;">Coding</a> <a href="/tags/git/" style="font-size: 15px;">Git</a> <a href="/tags/github/" style="font-size: 10px;">GitHub</a> <a href="/tags/hexo/" style="font-size: 15px;">Hexo</a> <a href="/tags/intellij-idea/" style="font-size: 10px;">Intellij Idea</a> <a href="/tags/java/" style="font-size: 10px;">JAVA</a> <a href="/tags/jdk8/" style="font-size: 10px;">JDK8</a> <a href="/tags/jvm/" style="font-size: 10px;">JVM</a> <a href="/tags/jenkins/" style="font-size: 15px;">Jenkins</a> <a href="/tags/kafka/" style="font-size: 10px;">Kafka</a> <a href="/tags/linux/" style="font-size: 20px;">Linux</a> <a href="/tags/mq/" style="font-size: 10px;">MQ</a> <a href="/tags/mac/" style="font-size: 10px;">Mac</a> <a href="/tags/map/" style="font-size: 10px;">Map</a> <a href="/tags/markdown/" style="font-size: 10px;">Markdown</a> <a href="/tags/mysql/" style="font-size: 10px;">MySQL</a> <a href="/tags/redis/" style="font-size: 10px;">Redis</a> <a href="/tags/webmagic/" style="font-size: 10px;">WebMagic</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/osn/" style="font-size: 10px;">osn</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/%E4%BA%92%E8%81%94%E7%BD%91/" style="font-size: 15px;">互联网</a> <a href="/tags/%E4%BC%98%E5%8C%96/" style="font-size: 10px;">优化</a> <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F/" style="font-size: 10px;">分布式</a> <a href="/tags/%E5%91%BD%E4%BB%A4/" style="font-size: 10px;">命令</a> <a href="/tags/%E5%B7%A5%E5%85%B7/" style="font-size: 10px;">工具</a> <a href="/tags/%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/" style="font-size: 10px;">开发工具</a> <a href="/tags/%E7%88%AC%E8%99%AB/" style="font-size: 10px;">爬虫</a> <a href="/tags/%E8%A1%8C%E8%AF%9D/" style="font-size: 10px;">行话</a>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">链接</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a href="http://hexo.io"  target="_blank">Hexo</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://zoufeng.net/"  target="_blank">foam | 我一直在找寻有你的世界</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://www.luojiawei.me/"  target="_blank">getNway的博客</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://hclab.cn/hclab/index.php/"  target="_blank">HCLAB-环宇创意电脑工作室</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+
+            
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2020 Paul<br>
+             <a  href="http://www.jibaole.top/" target="_blank">吉保乐</a>   <a href="http://beian.miit.gov.cn" target="_blank">京ICP备19023154号-1</a> <a href="http://github.com/jibaole/" target="_blank" rel="noopener">专注|技术</a>
+        </div>
+    </div>
+</footer>
+        
+    
+    <script id="cy_cmt_num" src="https://changyan.sohu.com/upload/plugins/plugins.list.count.js?clientId=cytonBPwX"></script>
+    <script charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/changyan.js" ></script>
+    <script type="text/javascript">
+    window.changyan.api.config({
+    appid: 'cytonBPwX',
+    conf: '1b66209a6513b68c97b0e6a412323593'
+    });
+    </script>
+
+
+
+
+    
+        
+<script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-share.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-video.min.js"></script>
+
+    
+    
+        
+<script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+
+    
+    
+
+
+
+<!-- Custom Scripts -->
+
+<script src="/js/main.js"></script>
+
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <meta charset="utf-8">
+    
+    <title>Redis常用操作命令 | Paul code</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="Redis常用操作命令官网地址(中文)：http:&#x2F;&#x2F;www.redis.cn&#x2F;桌面客户端：https:&#x2F;&#x2F;redisdesktop.com&#x2F;download入门教程：http:&#x2F;&#x2F;www.runoob.com&#x2F;redis&#x2F;redis-tutorial.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis常用操作命令">
+<meta property="og:url" content="http://www.jibaole.top/2018/01/06/Redis/index.html">
+<meta property="og:site_name" content="Paul code">
+<meta property="og:description" content="Redis常用操作命令官网地址(中文)：http:&#x2F;&#x2F;www.redis.cn&#x2F;桌面客户端：https:&#x2F;&#x2F;redisdesktop.com&#x2F;download入门教程：http:&#x2F;&#x2F;www.runoob.com&#x2F;redis&#x2F;redis-tutorial.html">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://p22kojxuy.bkt.clouddn.com/Article/img/2018/01/redis.jpg">
+<meta property="article:published_time" content="2018-01-06T12:07:43.000Z">
+<meta property="article:modified_time" content="2020-03-26T09:19:17.729Z">
+<meta property="article:author" content="Paul">
+<meta property="article:tag" content="Redis">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://p22kojxuy.bkt.clouddn.com/Article/img/2018/01/redis.jpg">
+    
+
+    
+        <link rel="alternate" href="/atom.xml" title="Paul code" type="application/atom+xml" />
+    
+
+    
+        <link rel="icon" href="/img/toux.png" />
+    
+
+    
+<link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+
+    
+<link rel="stylesheet" href="/libs/open-sans/styles.css">
+
+    
+<link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+    
+<link rel="stylesheet" href="/libs/bootstrap/css/bootstrap.min.css">
+
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+<script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+
+    
+<script src="/libs/bootstrap/js/bootstrap.min.js"></script>
+
+    
+    
+        
+<link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+
+    
+    
+        
+<link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+
+    
+    
+        <script type="text/javascript">
+(function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-111707541-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+    
+    
+    
+        <script>
+var _hmt = _hmt || [];
+(function() {
+    var hm = document.createElement("script");
+    hm.src = "//hm.baidu.com/hm.js?095ffb1d0ab8973dcab22bc6c6c9ee59";
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+    
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">Paul code</span>
+            </a>
+            <nav id="main-nav">
+                <div>
+                                    <ul class="nav navbar-nav">
+                                        
+                                            <a class="main-nav-link" href="/">主页</a>
+                                        
+                                            <a class="main-nav-link" href="/archives">归档</a>
+                                        
+                                            <a class="main-nav-link" href="/categories">分类</a>
+                                        
+                                            <a class="main-nav-link" href="/tags">标签</a>
+                                        
+                                        <li class="dropdown">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                                更多
+                                                <b class="caret"></b>
+                                            </a>
+                                            <ul class="dropdown-menu">
+                                                
+                                                    <li><a href="/favorites">网址书签</a></li>
+                                                
+                                                    <li><a href="/study">学习</a></li>
+                                                
+                                                    <li><a href="/tools">工具</a></li>
+                                                
+                                                    <li><a href="/books">书单</a></li>
+                                                
+                                                    <li><a href="/life">生活</a></li>
+                                                
+                                                    <li><a href="/about">关于</a></li>
+                                                
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/img/touxiang.jpg" />
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="想要查找什么..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/">主页</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">归档</a></td>
+                
+                    <td><a class="main-nav-link" href="/categories">分类</a></td>
+                
+                    <td><a class="main-nav-link" href="/tags">标签</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/img/touxiang.jpg" />
+            <h2 id="name">Paul</h2>
+            <h3 id="title">专注于技术</h3>
+            <span id="location"><i class="fa fa-map-marker"></i>BeiJing, China</span>
+            <a id="follow" target="_blank" href="https://github.com/jibaole/">关注我</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                25
+                <span>文章</span>
+            </div>
+            <div class="article-info-block">
+                33
+                <span>标签</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="https://github.com/jibaole" target="_blank" title="github" class=tooltip>
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="mailto:jibaole@foxmail.com" target="_blank" title="envelope" class=tooltip>
+                            <i class="fa fa-envelope"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="https://gitee.com/jibaole.com" target="_blank" title="git" class=tooltip>
+                            <i class="fa fa-git"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/18501278945" target="_blank" title="wechat" class=tooltip>
+                            <i class="fa fa-wechat"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/atom.xml" target="_blank" title="rss" class=tooltip>
+                            <i class="fa fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-Redis" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            Redis常用操作命令
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2018/01/06/Redis/">
+            <time datetime="2018-01-06T12:07:43.000Z" itemprop="datePublished">2018-01-06</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/redis/" rel="tag">Redis</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+                <div id="toc" class="toc-article">
+                <strong class="toc-title">文章目录</strong>
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Redis常用操作命令"><span class="toc-number">1.</span> <span class="toc-text">Redis常用操作命令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#一、对value操作的命令"><span class="toc-number">2.</span> <span class="toc-text">一、对value操作的命令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二、对String操作的命令"><span class="toc-number">3.</span> <span class="toc-text">二、对String操作的命令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#三、对List操作的命令"><span class="toc-number">4.</span> <span class="toc-text">三、对List操作的命令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#四、对Set操作的命令"><span class="toc-number">5.</span> <span class="toc-text">四、对Set操作的命令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#五、对zset（sorted-set）操作的命令"><span class="toc-number">6.</span> <span class="toc-text">五、对zset（sorted set）操作的命令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#六、对Hash操作的命令"><span class="toc-number">7.</span> <span class="toc-text">六、对Hash操作的命令</span></a></li></ol>
+                </div>
+            
+            <h2 id="Redis常用操作命令"><a href="#Redis常用操作命令" class="headerlink" title="Redis常用操作命令"></a>Redis常用操作命令</h2><p>官网地址(中文)：<a href="http://www.redis.cn/" target="_blank" rel="noopener">http://www.redis.cn/</a><br>桌面客户端：<a href="https://redisdesktop.com/download" target="_blank" rel="noopener">https://redisdesktop.com/download</a><br>入门教程：<a href="http://www.runoob.com/redis/redis-tutorial.html" target="_blank" rel="noopener">http://www.runoob.com/redis/redis-tutorial.html</a></p>
+<a id="more"></a>
+
+
+<blockquote>
+<p>Redis是一个开源（BSD许可）的，内存中的数据结构存储系统，它可以用作数据库、缓存和消息中间件。 它支持多种类型的数据结构，如 字符串（strings）， 散列（hashes）， 列表（lists）， 集合（sets）， 有序集合（sorted sets） 与范围查询， bitmaps， hyperloglogs 和 地理空间（geospatial） 索引半径查询。 Redis 内置了 复制（replication），LUA脚本（Lua scripting）， LRU驱动事件（LRU eviction），事务（transactions） 和不同级别的 磁盘持久化（persistence）， 并通过 Redis哨兵（Sentinel）和自动 分区（Cluster）提供高可用性（high availability）。<br><img src="http://p22kojxuy.bkt.clouddn.com/Article/img/2018/01/redis.jpg" alt="Redis"></p>
+</blockquote>
+<h2 id="一、对value操作的命令"><a href="#一、对value操作的命令" class="headerlink" title="一、对value操作的命令"></a>一、对value操作的命令</h2><figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="title">exists</span><span class="params">(key)</span></span>：确认一个key是否存在</span><br><span class="line"><span class="function"><span class="title">del</span><span class="params">(key)</span></span>：删除一个key</span><br><span class="line"><span class="function"><span class="title">type</span><span class="params">(key)</span></span>：返回值的类型</span><br><span class="line"><span class="function"><span class="title">keys</span><span class="params">(pattern)</span></span>：返回满足给定pattern的所有key</span><br><span class="line">randomkey：随机返回key空间的一个key</span><br><span class="line"><span class="function"><span class="title">rename</span><span class="params">(oldname, newname)</span></span>：将key由oldname重命名为newname，若newname存在则删除newname表示的key</span><br><span class="line">dbsize：返回当前数据库中key的数目</span><br><span class="line">expire：设定一个key的活动时间（s）</span><br><span class="line">ttl：获得一个key的活动时间</span><br><span class="line"><span class="function"><span class="title">select</span><span class="params">(index)</span></span>：按索引查询</span><br><span class="line"><span class="function"><span class="title">move</span><span class="params">(key, dbindex)</span></span>：将当前数据库中的key转移到有dbindex索引的数据库</span><br><span class="line">flushdb：删除当前选择数据库中的所有key</span><br><span class="line">flushall：删除所有数据库中的所有key</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="二、对String操作的命令"><a href="#二、对String操作的命令" class="headerlink" title="二、对String操作的命令"></a>二、对String操作的命令</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">set</span>(<span class="keyword">key</span>, <span class="keyword">value</span>)：给数据库中名称为<span class="keyword">key</span>的<span class="keyword">string</span>赋予值<span class="keyword">value</span></span><br><span class="line"><span class="keyword">get</span>(<span class="keyword">key</span>)：返回数据库中名称为<span class="keyword">key</span>的<span class="keyword">string</span>的<span class="keyword">value</span></span><br><span class="line">getset(<span class="keyword">key</span>, <span class="keyword">value</span>)：给名称为<span class="keyword">key</span>的<span class="keyword">string</span>赋予上一次的<span class="keyword">value</span></span><br><span class="line">mget(key1, key2,…, <span class="keyword">key</span> N)：返回库中多个<span class="keyword">string</span>（它们的名称为key1，key2…）的<span class="keyword">value</span></span><br><span class="line">setnx(<span class="keyword">key</span>, <span class="keyword">value</span>)：如果不存在名称为<span class="keyword">key</span>的<span class="keyword">string</span>，则向库中添加<span class="keyword">string</span>，名称为<span class="keyword">key</span>，值为<span class="keyword">value</span></span><br><span class="line">setex(<span class="keyword">key</span>, <span class="built_in">time</span>, <span class="keyword">value</span>)：向库中添加<span class="keyword">string</span>（名称为<span class="keyword">key</span>，值为<span class="keyword">value</span>）同时，设定过期时间<span class="built_in">time</span></span><br><span class="line">mset(key1, value1, key2, value2,…<span class="keyword">key</span> N, <span class="keyword">value</span> N)：同时给多个<span class="keyword">string</span>赋值，名称为<span class="keyword">key</span> i的<span class="keyword">string</span>赋值<span class="keyword">value</span> i</span><br><span class="line">msetnx(key1, value1, key2, value2,…<span class="keyword">key</span> N, <span class="keyword">value</span> N)：如果所有名称为<span class="keyword">key</span> i的<span class="keyword">string</span>都不存在，则向库中添加<span class="keyword">string</span>，名称<span class="keyword">key</span> i赋值为<span class="keyword">value</span> i</span><br><span class="line">incr(<span class="keyword">key</span>)：名称为<span class="keyword">key</span>的<span class="keyword">string</span>增<span class="number">1</span>操作</span><br><span class="line">incrby(<span class="keyword">key</span>, <span class="built_in">integer</span>)：名称为<span class="keyword">key</span>的<span class="keyword">string</span>增加<span class="built_in">integer</span></span><br><span class="line">decr(<span class="keyword">key</span>)：名称为<span class="keyword">key</span>的<span class="keyword">string</span>减<span class="number">1</span>操作</span><br><span class="line">decrby(<span class="keyword">key</span>, <span class="built_in">integer</span>)：名称为<span class="keyword">key</span>的<span class="keyword">string</span>减少<span class="built_in">integer</span></span><br><span class="line">append(<span class="keyword">key</span>, <span class="keyword">value</span>)：名称为<span class="keyword">key</span>的<span class="keyword">string</span>的值附加<span class="keyword">value</span></span><br><span class="line"><span class="keyword">substr</span>(<span class="keyword">key</span>, <span class="keyword">start</span>, <span class="keyword">end</span>)：返回名称为<span class="keyword">key</span>的<span class="keyword">string</span>的<span class="keyword">value</span>的子串</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、对List操作的命令"><a href="#三、对List操作的命令" class="headerlink" title="三、对List操作的命令"></a>三、对List操作的命令</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">rpush(key, value)：在名称为key的list尾添加一个值为value的元素</span><br><span class="line">lpush(key, value)：在名称为key的list头添加一个值为value的 元素</span><br><span class="line">llen(key)：返回名称为key的list的长度</span><br><span class="line">lrange(key, <span class="keyword">start</span>, <span class="keyword">end</span>)：返回名称为<span class="keyword">key</span>的<span class="keyword">list</span>中<span class="keyword">start</span>至<span class="keyword">end</span>之间的元素（下标从<span class="number">0</span>开始，下同）</span><br><span class="line"><span class="keyword">ltrim</span>(<span class="keyword">key</span>, <span class="keyword">start</span>, <span class="keyword">end</span>)：截取名称为<span class="keyword">key</span>的<span class="keyword">list</span>，保留<span class="keyword">start</span>至<span class="keyword">end</span>之间的元素</span><br><span class="line">lindex(<span class="keyword">key</span>, <span class="keyword">index</span>)：返回名称为<span class="keyword">key</span>的<span class="keyword">list</span>中<span class="keyword">index</span>位置的元素</span><br><span class="line">lset(<span class="keyword">key</span>, <span class="keyword">index</span>, <span class="keyword">value</span>)：给名称为<span class="keyword">key</span>的<span class="keyword">list</span>中<span class="keyword">index</span>位置的元素赋值为<span class="keyword">value</span></span><br><span class="line">lrem(<span class="keyword">key</span>, <span class="keyword">count</span>, <span class="keyword">value</span>)：删除<span class="keyword">count</span>个名称为<span class="keyword">key</span>的<span class="keyword">list</span>中值为<span class="keyword">value</span>的元素。<span class="keyword">count</span>为<span class="number">0</span>，删除所有值为<span class="keyword">value</span>的元素，<span class="keyword">count</span>&gt;<span class="number">0</span>从 头至尾删除<span class="keyword">count</span>个值为<span class="keyword">value</span>的元素，<span class="keyword">count</span>&lt;<span class="number">0</span>从尾到头删除|<span class="keyword">count</span>|个值为<span class="keyword">value</span>的元素。 lpop(<span class="keyword">key</span>)：返回并删除名称为<span class="keyword">key</span>的<span class="keyword">list</span>中的首元素 rpop(<span class="keyword">key</span>)：返回并删除名称为<span class="keyword">key</span>的<span class="keyword">list</span>中的尾元素 blpop(key1, key2,… <span class="keyword">key</span> N, <span class="keyword">timeout</span>)：lpop命令的<span class="keyword">block</span>版本。即当<span class="keyword">timeout</span>为<span class="number">0</span>时，若遇到名称为<span class="keyword">key</span> i的<span class="keyword">list</span>不存在或该<span class="keyword">list</span>为空，则命令结束。如果<span class="keyword">timeout</span>&gt;<span class="number">0</span>，则遇到上述情况时，等待<span class="keyword">timeout</span>秒，如果问题没有解决，则对 keyi+<span class="number">1</span>开始的<span class="keyword">list</span>执行pop操作。</span><br><span class="line">brpop(key1, key2,… <span class="keyword">key</span> N, <span class="keyword">timeout</span>)：rpop的<span class="keyword">block</span>版本。参考上一命令。</span><br><span class="line">rpoplpush(srckey, dstkey)：返回并删除名称为srckey的<span class="keyword">list</span>的尾元素，并将该元素添加到名称为dstkey的<span class="keyword">list</span>的头部</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、对Set操作的命令"><a href="#四、对Set操作的命令" class="headerlink" title="四、对Set操作的命令"></a>四、对Set操作的命令</h2><figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="title">sadd</span><span class="params">(key, member)</span></span>：向名称为key的set中添加元素member</span><br><span class="line"><span class="function"><span class="title">srem</span><span class="params">(key, member)</span></span> ：删除名称为key的set中的元素member</span><br><span class="line"><span class="function"><span class="title">spop</span><span class="params">(key)</span></span> ：随机返回并删除名称为key的set中一个元素</span><br><span class="line"><span class="function"><span class="title">smove</span><span class="params">(srckey, dstkey, member)</span></span> ：将member元素从名称为srckey的集合移到名称为dstkey的集合</span><br><span class="line"><span class="function"><span class="title">scard</span><span class="params">(key)</span></span> ：返回名称为key的set的基数</span><br><span class="line"><span class="function"><span class="title">sismember</span><span class="params">(key, member)</span></span> ：测试member是否是名称为key的set的元素</span><br><span class="line"><span class="function"><span class="title">sinter</span><span class="params">(key1, key2,…key N)</span></span> ：求交集</span><br><span class="line"><span class="function"><span class="title">sinterstore</span><span class="params">(dstkey, key1, key2,…key N)</span></span> ：求交集并将交集保存到dstkey的集合</span><br><span class="line"><span class="function"><span class="title">sunion</span><span class="params">(key1, key2,…key N)</span></span> ：求并集</span><br><span class="line"><span class="function"><span class="title">sunionstore</span><span class="params">(dstkey, key1, key2,…key N)</span></span> ：求并集并将并集保存到dstkey的集合</span><br><span class="line"><span class="function"><span class="title">sdiff</span><span class="params">(key1, key2,…key N)</span></span> ：求差集</span><br><span class="line"><span class="function"><span class="title">sdiffstore</span><span class="params">(dstkey, key1, key2,…key N)</span></span> ：求差集并将差集保存到dstkey的集合</span><br><span class="line"><span class="function"><span class="title">smembers</span><span class="params">(key)</span></span> ：返回名称为key的set的所有元素</span><br><span class="line"><span class="function"><span class="title">srandmember</span><span class="params">(key)</span></span> ：随机返回名称为key的set的一个元素</span><br></pre></td></tr></table></figure>
+
+<h2 id="五、对zset（sorted-set）操作的命令"><a href="#五、对zset（sorted-set）操作的命令" class="headerlink" title="五、对zset（sorted set）操作的命令"></a>五、对zset（sorted set）操作的命令</h2><figure class="highlight maxima"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">zadd(<span class="built_in">key</span>, score, <span class="built_in">member</span>)：向名称为<span class="built_in">key</span>的zset中添加元素<span class="built_in">member</span>，score用于排序。如果该元素已经存在，则根据score更新该元素的顺序。</span><br><span class="line">zrem(<span class="built_in">key</span>, <span class="built_in">member</span>) ：删除名称为<span class="built_in">key</span>的zset中的元素<span class="built_in">member</span></span><br><span class="line">zincrby(<span class="built_in">key</span>, increment, <span class="built_in">member</span>) ：如果在名称为<span class="built_in">key</span>的zset中已经存在元素<span class="built_in">member</span>，则该元素的score增加increment；否则向集合中添加该元素，其score的值为increment</span><br><span class="line">zrank(<span class="built_in">key</span>, <span class="built_in">member</span>) ：返回名称为<span class="built_in">key</span>的zset（元素已按score从小到大排序）中<span class="built_in">member</span>元素的<span class="built_in">rank</span>（即index，从<span class="number">0</span>开始），若没有<span class="built_in">member</span>元素，返回“nil”</span><br><span class="line">zrevrank(<span class="built_in">key</span>, <span class="built_in">member</span>) ：返回名称为<span class="built_in">key</span>的zset（元素已按score从大到小排序）中<span class="built_in">member</span>元素的<span class="built_in">rank</span>（即index，从<span class="number">0</span>开始），若没有<span class="built_in">member</span>元素，返回“nil”</span><br><span class="line">zrange(<span class="built_in">key</span>, start, end)：返回名称为<span class="built_in">key</span>的zset（元素已按score从小到大排序）中的index从start到end的所有元素</span><br><span class="line">zrevrange(<span class="built_in">key</span>, start, end)：返回名称为<span class="built_in">key</span>的zset（元素已按score从大到小排序）中的index从start到end的所有元素</span><br><span class="line">zrangebyscore(<span class="built_in">key</span>, <span class="built_in">min</span>, <span class="built_in">max</span>)：返回名称为<span class="built_in">key</span>的zset中score &gt;= <span class="built_in">min</span>且score &lt;= <span class="built_in">max</span>的所有元素 zcard(<span class="built_in">key</span>)：返回名称为<span class="built_in">key</span>的zset的基数 zscore(<span class="built_in">key</span>, element)：返回名称为<span class="built_in">key</span>的zset中元素element的score zremrangebyrank(<span class="built_in">key</span>, <span class="built_in">min</span>, <span class="built_in">max</span>)：删除名称为<span class="built_in">key</span>的zset中<span class="built_in">rank</span> &gt;= <span class="built_in">min</span>且<span class="built_in">rank</span> &lt;= <span class="built_in">max</span>的所有元素 zremrangebyscore(<span class="built_in">key</span>, <span class="built_in">min</span>, <span class="built_in">max</span>) ：删除名称为<span class="built_in">key</span>的zset中score &gt;= <span class="built_in">min</span>且score &lt;= <span class="built_in">max</span>的所有元素</span><br><span class="line">zunionstore / zinterstore(dstkeyN, key1,…,keyN, WEIGHTS w1,…wN, AGGREGATE SUM|MIN|MAX)：对N个zset求并集和交集，并将最后的集合保存在dstkeyN中。对于集合中每一个元素的score，在进行 AGGREGATE运算前，都要乘以对于的WEIGHT参数。如果没有提供WEIGHT，默认为<span class="number">1</span>。默认的AGGREGATE是SUM，即结果集合中元素 的score是所有集合对应元素进行SUM运算的值，而MIN和MAX是指，结果集合中元素的score是所有集合对应元素中最小值和最大值。</span><br></pre></td></tr></table></figure>
+<h2 id="六、对Hash操作的命令"><a href="#六、对Hash操作的命令" class="headerlink" title="六、对Hash操作的命令"></a>六、对Hash操作的命令</h2><figure class="highlight q"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">hset(<span class="built_in">key</span>, field, <span class="built_in">value</span>)：向名称为<span class="built_in">key</span>的hash中添加元素field&lt;—&gt;<span class="built_in">value</span></span><br><span class="line">hget(<span class="built_in">key</span>, field)：返回名称为<span class="built_in">key</span>的hash中field对应的<span class="built_in">value</span></span><br><span class="line">hmget(<span class="built_in">key</span>, field1, …,field N)：返回名称为<span class="built_in">key</span>的hash中field i对应的<span class="built_in">value</span></span><br><span class="line">hmset(<span class="built_in">key</span>, field1, value1,…,field N, <span class="built_in">value</span> N)：向名称为<span class="built_in">key</span>的hash中添加元素field i&lt;—&gt;<span class="built_in">value</span> i</span><br><span class="line">hincrby(<span class="built_in">key</span>, field, integer)：将名称为<span class="built_in">key</span>的hash中field的<span class="built_in">value</span>增加integer</span><br><span class="line">hexists(<span class="built_in">key</span>, field)：名称为<span class="built_in">key</span>的hash中是否存在键为field的域</span><br></pre></td></tr></table></figure>
+
+
+        
+        </div>
+
+	<div id="donate" style="text-align:center">
+	<!-- 添加捐赠图标 -->
+<div class="post-donate" style="margin-bottom: 30px;margin-top: 10px;">
+    <div id="donate_board" class="donate_bar center">
+        <a id="btn_donate" class="btn_donate" href="javascript:;" title="donate"></a>
+        <span class="donate_txt">
+           欣赏此文？求鼓励，求支持！
+        </span>
+        <br>
+    </div>
+    <div id="donate_guide" class="donate_bar donate_bar2 center hidden">
+        <img src="/css/images/alipay.png" id="weixin" title="alipay doante" alt="alipay doante">
+        <img src="/css/images/wechatpay.png" title="wechatpay donate" id="zhifubao" alt="echatpay donate">
+    </div>
+    <script type="text/javascript">
+        $('#weixin').hover()
+        document.getElementById('btn_donate').onclick = function () {
+            $('#donate_board').addClass('hidden');
+            $('#donate_guide').removeClass('hidden');
+        }
+    </script>
+</div>
+	</div>
+
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+    <div class="bdsharebuttonbox">
+    <a href="#" class="bds_more" data-cmd="more">分享到：</a>
+    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间">QQ空间</a>
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博">新浪微博</a>
+    <a href="#" class="bds_tqq" data-cmd="tqq" title="分享到腾讯微博">腾讯微博</a>
+    <a href="#" class="bds_renren" data-cmd="renren" title="分享到人人网">人人网</a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信">微信</a>
+</div>
+<script>
+window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"16"},"share":{"bdSize":16}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+<style>
+    .bdshare_popup_box {
+        border-radius: 4px;
+        border: #e1e1e1 solid 1px;
+    }
+    .bdshare-button-style0-16 a,
+    .bdshare-button-style0-16 .bds_more {
+        padding-left: 20px;
+        margin: 6px 10px 6px 0;
+    }
+    .bdshare_dialog_list a,
+    .bdshare_popup_list a,
+    .bdshare_popup_bottom a {
+        font-family: 'Microsoft Yahei';
+    }
+    .bdshare_popup_top {
+        display: none;
+    }
+    .bdshare_popup_bottom {
+        height: auto;
+        padding: 5px;
+    }
+</style>
+
+
+</div>
+
+            
+    
+        <a href="http://www.jibaole.top/2018/01/06/Redis/#comments" id="sourceId::2018/01/06/Redis/" class="article-comment-link cy_cmt_count">评论</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+        <a href="/2018/01/09/%E4%BA%92%E8%81%94%E7%BD%91%E9%BB%91%E8%AF%9D/" id="article-nav-newer" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">上一篇</strong>
+            <div class="article-nav-title">
+                
+                    互联网程序员行话
+                
+            </div>
+        </a>
+    
+    
+        <a href="/2017/02/03/markdown-use/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">下一篇</strong>
+            <div class="article-nav-title">Markdown 编辑阅读器(效果)</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    
+        <section id="comments">
+    <div id="SOHUCS" sid="2018/01/06/Redis/"></div>
+</section>
+    
+
+</section>
+            
+                
+<aside id="sidebar">
+   
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">最新文章</h3>
+        <div class="widget">
+            <ul id="recent-post" class="">
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2019/06/18/mysql%E6%9F%A5%E7%9C%8B%E9%94%81%E8%A1%A8%E5%9C%BA%E6%99%AF%E5%A4%84%E7%90%86/" class="thumbnail">
+    
+    
+        <span style="background-image:url(http://p22kojxuy.bkt.clouddn.com/Article/img/2018/01/tython.jpg)" alt="MySQL查看锁表场景处理" class="thumbnail-image"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2019/06/18/mysql%E6%9F%A5%E7%9C%8B%E9%94%81%E8%A1%A8%E5%9C%BA%E6%99%AF%E5%A4%84%E7%90%86/" class="title">MySQL查看锁表场景处理</a></p>
+                            <p class="item-date"><time datetime="2019-06-18T08:31:31.000Z" itemprop="datePublished">2019-06-18</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2019/05/27/%E8%AE%B0%E4%B8%80%E6%AC%A1%E7%BA%BF%E4%B8%8A%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5/" class="thumbnail">
+    
+    
+        <span style="background-image:url(https://blog-1255565289.cos.ap-beijing.myqcloud.com/image/20190526225740.png)" alt="记一次线上问题排查" class="thumbnail-image"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/java/">Java</a></p>
+                            <p class="item-title"><a href="/2019/05/27/%E8%AE%B0%E4%B8%80%E6%AC%A1%E7%BA%BF%E4%B8%8A%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5/" class="title">记一次线上问题排查</a></p>
+                            <p class="item-date"><time datetime="2019-05-27T12:06:21.000Z" itemprop="datePublished">2019-05-27</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2019/05/26/JVM-%E7%BA%BF%E4%B8%8A%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C%E6%B5%81%E7%A8%8B/" class="thumbnail">
+    
+    
+        <span style="background-image:url(https://blog-1255565289.cos.ap-beijing.myqcloud.com/image/20190526225740.png)" alt="JVM 线上故障排查基本操作流程" class="thumbnail-image"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/java/">Java</a></p>
+                            <p class="item-title"><a href="/2019/05/26/JVM-%E7%BA%BF%E4%B8%8A%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C%E6%B5%81%E7%A8%8B/" class="title">JVM 线上故障排查基本操作流程</a></p>
+                            <p class="item-date"><time datetime="2019-05-26T14:40:14.000Z" itemprop="datePublished">2019-05-26</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2019/05/24/kafka-%E5%AE%89%E8%A3%85%E5%8F%8A%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8/" class="thumbnail">
+    
+    
+        <span style="background-image:url(https://blog-1255565289.cos.ap-beijing.myqcloud.com/image/20190526225908.png)" alt="Kafka 安装及快速入门" class="thumbnail-image"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/%E4%B8%AD%E9%97%B4%E4%BB%B6/">中间件</a></p>
+                            <p class="item-title"><a href="/2019/05/24/kafka-%E5%AE%89%E8%A3%85%E5%8F%8A%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8/" class="title">Kafka 安装及快速入门</a></p>
+                            <p class="item-date"><time datetime="2019-05-24T05:01:38.000Z" itemprop="datePublished">2019-05-24</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2019/05/18/linux%E5%91%BD%E4%BB%A4%E4%B9%8Bless/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/linux/">Linux</a></p>
+                            <p class="item-title"><a href="/2019/05/18/linux%E5%91%BD%E4%BB%A4%E4%B9%8Bless/" class="title">Linux命令之Less</a></p>
+                            <p class="item-date"><time datetime="2019-05-18T04:17:07.000Z" itemprop="datePublished">2019-05-18</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">归档</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">五月 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">十二月 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">十一月 2016</a><span class="archive-list-count">4</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签云</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/acid/" style="font-size: 10px;">ACID</a> <a href="/tags/alyunmq/" style="font-size: 10px;">AlYunMQ</a> <a href="/tags/base/" style="font-size: 10px;">BASE</a> <a href="/tags/cap/" style="font-size: 10px;">CAP</a> <a href="/tags/coding/" style="font-size: 10px;">Coding</a> <a href="/tags/git/" style="font-size: 15px;">Git</a> <a href="/tags/github/" style="font-size: 10px;">GitHub</a> <a href="/tags/hexo/" style="font-size: 15px;">Hexo</a> <a href="/tags/intellij-idea/" style="font-size: 10px;">Intellij Idea</a> <a href="/tags/java/" style="font-size: 10px;">JAVA</a> <a href="/tags/jdk8/" style="font-size: 10px;">JDK8</a> <a href="/tags/jvm/" style="font-size: 10px;">JVM</a> <a href="/tags/jenkins/" style="font-size: 15px;">Jenkins</a> <a href="/tags/kafka/" style="font-size: 10px;">Kafka</a> <a href="/tags/linux/" style="font-size: 20px;">Linux</a> <a href="/tags/mq/" style="font-size: 10px;">MQ</a> <a href="/tags/mac/" style="font-size: 10px;">Mac</a> <a href="/tags/map/" style="font-size: 10px;">Map</a> <a href="/tags/markdown/" style="font-size: 10px;">Markdown</a> <a href="/tags/mysql/" style="font-size: 10px;">MySQL</a> <a href="/tags/redis/" style="font-size: 10px;">Redis</a> <a href="/tags/webmagic/" style="font-size: 10px;">WebMagic</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/osn/" style="font-size: 10px;">osn</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/%E4%BA%92%E8%81%94%E7%BD%91/" style="font-size: 15px;">互联网</a> <a href="/tags/%E4%BC%98%E5%8C%96/" style="font-size: 10px;">优化</a> <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F/" style="font-size: 10px;">分布式</a> <a href="/tags/%E5%91%BD%E4%BB%A4/" style="font-size: 10px;">命令</a> <a href="/tags/%E5%B7%A5%E5%85%B7/" style="font-size: 10px;">工具</a> <a href="/tags/%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/" style="font-size: 10px;">开发工具</a> <a href="/tags/%E7%88%AC%E8%99%AB/" style="font-size: 10px;">爬虫</a> <a href="/tags/%E8%A1%8C%E8%AF%9D/" style="font-size: 10px;">行话</a>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">链接</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a href="http://hexo.io"  target="_blank">Hexo</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://zoufeng.net/"  target="_blank">foam | 我一直在找寻有你的世界</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://www.luojiawei.me/"  target="_blank">getNway的博客</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://hclab.cn/hclab/index.php/"  target="_blank">HCLAB-环宇创意电脑工作室</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+
+            
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2020 Paul<br>
+             <a  href="http://www.jibaole.top/" target="_blank">吉保乐</a>   <a href="http://beian.miit.gov.cn" target="_blank">京ICP备19023154号-1</a> <a href="http://github.com/jibaole/" target="_blank" rel="noopener">专注|技术</a>
+        </div>
+    </div>
+</footer>
+        
+    
+    <script id="cy_cmt_num" src="https://changyan.sohu.com/upload/plugins/plugins.list.count.js?clientId=cytonBPwX"></script>
+    <script charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/changyan.js" ></script>
+    <script type="text/javascript">
+    window.changyan.api.config({
+    appid: 'cytonBPwX',
+    conf: '1b66209a6513b68c97b0e6a412323593'
+    });
+    </script>
+
+
+
+
+    
+        
+<script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-share.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-video.min.js"></script>
+
+    
+    
+        
+<script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+
+    
+    
+
+
+
+<!-- Custom Scripts -->
+
+<script src="/js/main.js"></script>
+
+
+    </div>
+</body>
+</html>
